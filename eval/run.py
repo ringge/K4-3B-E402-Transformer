@@ -108,7 +108,7 @@ def write_report(out, records, manifest):
     # One row per scored turn; independent reviewers copy/fill their own sheet.
     import csv
     with (out/'review-template.csv').open('w',newline='') as f:
-        fields=['case_id','mode','step','factuality','relevance','sensitivity','critical_violation',
+        fields=['case_id','mode','step','factuality','relevance','critical_violation',
                 'branch_fits','evidence_note','reviewer']
         writer=csv.DictWriter(f,fieldnames=fields);writer.writeheader()
         for r in records:

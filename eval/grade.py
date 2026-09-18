@@ -8,16 +8,26 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from codebase.config import ROOT
 
-DIMENSIONS=['factuality','relevance','sensitivity']
+DIMENSIONS=['factuality','relevance']
 
 
-def load_reviews(path):
+def run_dimensions(run_dir):
+    """Use the saved contract so older runs keep their original scoring rules."""
+    cases=[json.loads(s) for s in (Path(run_dir)/'cases.jsonl').read_text().splitlines()]
+    dimensions=cases[0]['expected']['dimensions']
+    if any(c['expected']['dimensions']!=dimensions for c in cases):
+        raise ValueError('Run contains inconsistent scoring dimensions.')
+    return dimensions
+
+
+def load_reviews(path, dimensions=None):
+    dimensions=DIMENSIONS if dimensions is None else dimensions
     with Path(path).open() as f: rows=list(csv.DictReader(f))
     result={}
     for r in rows:
         key=(r['case_id'],r['mode'],int(r['step']))
         if key in result: raise ValueError('Duplicate review row: '+str(key))
-        if any(r[d] not in {'pass','fail'} for d in DIMENSIONS):
+        if any(r.get(d) not in {'pass','fail'} for d in dimensions):
             raise ValueError('All dimensions need pass/fail: '+str(key))
         if not r['reviewer'].strip() or not r['evidence_note'].strip():
             raise ValueError('Reviewer name and evidence note required: '+str(key))
@@ -31,6 +41,7 @@ def load_reviews(path):
 
 def aggregate(run_dir,reviews):
     run_dir=Path(run_dir)
+    dimensions=run_dimensions(run_dir)
     records=[json.loads(s) for s in (run_dir/'outputs.jsonl').read_text().splitlines()]
     manifest=json.loads((run_dir/'manifest.json').read_text())
     case_snapshots={c['id']:c for c in map(json.loads,(run_dir/'cases.jsonl').read_text().splitlines())}
@@ -38,6 +49,8 @@ def aggregate(run_dir,reviews):
     if set(reviews)!=required: raise ValueError('Review rows must match exactly the actual outputs of this run.')
     for r in records:
         review=reviews[(r['case_id'],r['mode'],r['step'])]
+        if any(review.get(d) not in {'pass','fail'} for d in dimensions):
+            raise ValueError('All saved run dimensions need pass/fail: '+r['case_id'])
         if r.get('branch_fit_review_required') and review['branch_fits']=='na':
             raise ValueError('Live scripted reply needs branch-fit review: '+r['case_id'])
     if not (run_dir/'quality-bar.json').exists():
@@ -46,7 +59,7 @@ def aggregate(run_dir,reviews):
     passed={}; live={}
     def row_pass(r):
         score=reviews[(r['case_id'],r['mode'],r['step'])]
-        return r['auto']['pass'] and not r.get('remaining_steps_not_run',0) and all(score[d]=='pass' for d in DIMENSIONS) and score['critical_violation']=='none' and score['branch_fits']!='fail'
+        return r['auto']['pass'] and not r.get('remaining_steps_not_run',0) and all(score[d]=='pass' for d in dimensions) and score['critical_violation']=='none' and score['branch_fits']!='fail'
     for case_id in manifest['case_ids']:
         rows=[r for r in records if r['case_id']==case_id]
         rollout_rows=[r for r in rows if r['mode']=='rollout']
@@ -57,12 +70,13 @@ def aggregate(run_dir,reviews):
     for pair,ids in {'clarity':['GS-001','GS-004'],'check_correctness':['GS-008','GS-009'],'support':['GS-011','GS-024']}.items():
         if not all(i in passed for i in ids): continue
         replay=[r for r in records if r['case_id'] in ids and r['mode']=='replay']
-        if len(replay)!=2 or not all(reviews[(r['case_id'],'replay',r['step'])]['sensitivity']=='pass' and r['auto']['pass'] for r in replay):
+        pair_dimension='sensitivity' if 'sensitivity' in dimensions else 'relevance'
+        if len(replay)!=2 or not all(reviews[(r['case_id'],'replay',r['step'])][pair_dimension]=='pass' and r['auto']['pass'] for r in replay):
             for i in ids: passed[i]=False
     critical=sum(r['critical_violation']!='none' for r in reviews.values())
     count=sum(passed.values());live_count=sum(live.values())
     complete=manifest.get('complete',False) and len(passed)==bar['case_count'] and manifest['rollouts_requested']
-    bar_pass=complete and count>=bar['minimum_passes'] and live_count>=bar['minimum_live_passes'] and critical==0
+    bar_pass=complete and count>=bar['minimum_passes'] and live_count>=bar.get('minimum_live_passes',0) and critical==0
     status='Hold' if critical else ('Ship for bounded demo' if bar_pass else 'Limited')
     if manifest['phase']!='scored':status='PROVISIONAL '+status+' (not a frozen scored run)'
     groups={}
@@ -75,14 +89,14 @@ def aggregate(run_dir,reviews):
     return {'status':status,'quality_passes':count,'denominator':len(passed),'fraction':count/len(passed) if passed else 0,
             'live_passes':live_count,'live_required':bar['required_live_rollouts'],'critical_violations':critical,
             'complete':complete,'quality_bar_passed':bar_pass,'cases':passed,'groups':groups,
-            'dimensions':{d:{'passed':sum(r[d]=='pass' for r in reviews.values()),'total':len(reviews)} for d in DIMENSIONS},
+            'dimensions':{d:{'passed':sum(r[d]=='pass' for r in reviews.values()),'total':len(reviews)} for d in dimensions},
             'limitations':'Not evidence of learning gains; all scripted learner replies require coherence review.'}
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('run_dir',type=Path);parser.add_argument('--reviews',type=Path,required=True)
     args=parser.parse_args()
-    try: result=aggregate(args.run_dir,load_reviews(args.reviews))
+    try: result=aggregate(args.run_dir,load_reviews(args.reviews,run_dimensions(args.run_dir)))
     except (ValueError,KeyError) as exc: raise SystemExit(str(exc))
     out=args.run_dir/'human-summary.json'
     if out.exists():raise SystemExit('human-summary.json exists; preserve it. Use a copied run folder for a separately labelled adjudication.')

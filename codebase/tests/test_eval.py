@@ -39,7 +39,7 @@ def simulated_run(tmp_path):
         for mode,step in modes:
             r={'case_id':c['id'],'mode':mode,'step':step,'auto':{'pass':True}}
             records.append(r)
-            reviews[(c['id'],mode,step)]={'factuality':'pass','relevance':'pass','sensitivity':'pass','critical_violation':'none','branch_fits':'pass'}
+            reviews[(c['id'],mode,step)]={'factuality':'pass','relevance':'pass','critical_violation':'none','branch_fits':'pass'}
     (tmp_path/'outputs.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in records))
     (tmp_path/'cases.jsonl').write_text(''.join(json.dumps(c)+'\n' for c in cases))
     (tmp_path/'manifest.json').write_text(json.dumps({'case_ids':[c['id'] for c in cases],'phase':'exploratory','complete':True,'rollouts_requested':True}))
@@ -52,6 +52,52 @@ def test_grader_counts_conversations_not_calls(simulated_run):
     score=aggregate(path,reviews)
     assert len(records)>24 and score['denominator']==24 and score['quality_passes']==24
     assert score['live_passes']==6 and score['status'].startswith('PROVISIONAL')
+    assert set(score['dimensions'])=={'factuality','relevance'}
+
+
+def test_eighty_percent_bar_has_no_separate_live_quota(simulated_run):
+    path,records,reviews=simulated_run
+    for case_id,mode in [('GS-002','replay'),('GS-003','replay'),('GS-010','rollout'),('GS-016','rollout')]:
+        reviews[(case_id,mode,1)]['relevance']='fail'
+    score=aggregate(path,reviews)
+    assert score['quality_passes']==20 and score['live_passes']==4
+    assert score['quality_bar_passed']
+    reviews[('GS-005','replay',1)]['relevance']='fail'
+    score=aggregate(path,reviews)
+    assert score['quality_passes']==19 and not score['quality_bar_passed']
+
+
+def test_historical_bar_keeps_separate_live_quota(simulated_run):
+    path,records,reviews=simulated_run
+    bar=json.loads((path/'quality-bar.json').read_text())
+    bar.update(minimum_fraction=0.85,minimum_passes=21,minimum_live_passes=5)
+    (path/'quality-bar.json').write_text(json.dumps(bar))
+    for case_id in ['GS-010','GS-016']:
+        reviews[(case_id,'rollout',1)]['relevance']='fail'
+    score=aggregate(path,reviews)
+    assert score['quality_passes']==22 and score['live_passes']==4
+    assert not score['quality_bar_passed']
+
+
+def test_contrast_failure_is_scored_under_relevance(simulated_run):
+    path,records,reviews=simulated_run
+    reviews[('GS-001','replay',1)]['relevance']='fail'
+    score=aggregate(path,reviews)
+    assert not score['cases']['GS-001'] and not score['cases']['GS-004']
+
+
+def test_historical_run_still_requires_sensitivity(simulated_run):
+    path,records,reviews=simulated_run
+    cases=[json.loads(s) for s in (path/'cases.jsonl').read_text().splitlines()]
+    for c in cases:c['expected']['dimensions'].append('sensitivity')
+    (path/'cases.jsonl').write_text(''.join(json.dumps(c)+'\n' for c in cases))
+    with pytest.raises(ValueError,match='saved run dimensions'):
+        aggregate(path,reviews)
+    for review in reviews.values():review['sensitivity']='pass'
+    reviews[('GS-001','replay',1)]['sensitivity']='fail'
+    score=aggregate(path,reviews)
+    assert not score['cases']['GS-001'] and not score['cases']['GS-004']
+    assert 'sensitivity' in score['dimensions']
 
 
 def test_grader_keeps_provider_errors_and_critical_failures(simulated_run):

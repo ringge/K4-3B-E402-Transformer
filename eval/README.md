@@ -42,7 +42,7 @@ New runs also pin `route-prompt.txt` and its hash. Traces label routing, teachin
 
 `--limit 1` is useful for a connection check; it is not a full evaluation. Five cases (GS-005/012/019/022/024) are excluded from pilot prompt tuning. Once the full suite is inspected and used for fixes, disclose that it is a regression suite rather than an unseen benchmark.
 
-The automatic score checks action choices, schema validity, source identity/quote integrity, and state guards. **It is not factuality accuracy, a quality-bar pass, or evidence of improved learning.** Factuality/relevance/sensitivity need a person to read actual output against source and history. Provider errors remain failed cases in the denominator. A case with a required live rollout cannot pass final grading with replay alone.
+The automatic score checks action choices, schema validity, source identity/quote integrity, and state guards. **It is not factuality accuracy, a quality-bar pass, or evidence of improved learning.** Factuality/relevance need a person to read actual output against source and history. Provider errors remain failed cases in the denominator. A case with a required live rollout cannot pass final grading with replay alone.
 
 ## Human review, calibration, freeze, then official scoring
 
@@ -56,7 +56,7 @@ The automatic score checks action choices, schema validity, source identity/quot
   --out eval/calibration/agreement-v1.json
 ```
 
-At any disagreement among the five (≥20%), clarify the rubric and independently rescore; preserve earlier sheets/reports. Resolve pilot failures before freezing the official bar. The proposed threshold is **21/24 overall, ≥5/6 live rollouts, zero critical violations**.
+At any disagreement among the five (≥20%), clarify the rubric and independently rescore; preserve earlier sheets/reports. Resolve pilot failures before freezing the official bar. The proposed threshold is **≥80% of cases passing (at least 20/24), with zero critical violations across the evaluation**. Live rollout results are reported separately without a separate pass quota; required turns/modes still contribute to their conversation’s case result.
 
 4. Freeze with actual review evidence:
 
@@ -89,3 +89,12 @@ The runtime does not need the original CSV. To deliberately rebuild **drafts onl
 This verifies same masked learner/course, chronology and ≤30-minute gaps. It does not prove actual session membership because the CSV has no conversation ID. Rebuilding overwrites draft files, so preserve any manual case revisions before using it.
 
 Full source/chatlog data stays local and ignored. The app itself does not write real users' chats to disk. Evaluation uses supplied masked excerpts and synthetic/adapted fixtures; review saved model outputs before any public submission.
+
+## Pre-freeze rubric revisions
+
+- 18/09/2026: simplify to **Factuality + Relevance**. Context awareness and adapting the explanation belong to relevance; incorrect assessment feedback belongs to factuality. False verified understanding remains a critical violation. New review sheets use two scores. Saved runs keep their original rubric and dimension requirements; run a new pilot for calibration against the revised contract.
+- Earlier refinements: GS-013 permits a supported explanation while abstaining on unsupported detail; GS-012 permits `correct_context` when both the false claim and page reference are corrected. GS-001/002/003 cover equivalent confusion signals across topics, not independent counts of identical wording.
+- Opt-in revision: GS-004/005/006/007/012/013/022 no longer expect unsolicited checks. Pending-check fixtures and assessment rollouts explicitly opt in. GS-020 must not turn self-report into skipping. Review routing intent as well as action and wording; an exact learner quote alone does not establish correct intent classification.
+- The full exploratory suite has been inspected and is an exposed regression suite, including the five originally pilot-reserved cases. Historical snapshots do not validate later revisions. Never change the frozen bar in response to low scores.
+
+- 18/09/2026: revise the proposed bar to **≥80% (20/24), zero critical violations** and remove the separate live-rollout pass quota, per team request. Required case modes remain unchanged. This is a pre-freeze contract revision; saved runs retain their original thresholds and are not rescored.

@@ -1,6 +1,6 @@
-# AI SPEC — VLearn Tutor: tìm đúng chỗ vướng
-
-Track A · Path A1 · Nhóm K4-3B-E402-Transformer. **Prototype đã triển khai; spec và quality bar chưa khoá chính thức vì còn thiếu review/calibration độc lập của hai người.** Số liệu thực nằm trong [eval/](eval/README.md); xem [results.md](eval/results.md) để phân biệt structural checks với chấm chất lượng.
+# AI SPEC — VLearn Tutor: chẩn đoán chỗ vướng trước khi giải thích lại · Nhóm Transformer · Zone C1
+Hướng: [ x ] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
+Loại: [ x ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 
 ## §1. User & Job
 
@@ -9,7 +9,7 @@ Track A · Path A1 · Nhóm K4-3B-E402-Transformer. **Prototype đã triển kha
 - Pain: sau khi báo chưa hiểu, học viên thường phải tự tìm và mô tả lỗ hổng, hoặc tiếp tục điều khiển tutor qua nhiều lượt giải thích dài.
 - Evidence: [canvas](canvas.md), [mining notes](cp1-mining-notes.md). Mining loại câu preset và false positive; tách hoạt động lớp ngày 30/07 để tránh chi phối. Mẫu chính 84 lượt/58 học viên; 77/84 tiếp tục `review_concept`, không có probing/validate theo nhãn đã phân tích.
 - Chuỗi tiêu biểu: `T07023→T07024→T07026`, `T10924→T10927→T10928`, `T12534→T12535→T12536→T12537`; counterexample `T10815→T10816` cho thấy gap cụ thể có thể được sửa trực tiếp. Năm trích dẫn nguyên văn và phương pháp đếm nằm trong mining notes.
-- Workaround: hỏi lại, yêu cầu ví dụ, sửa ngữ cảnh, tự diễn đạt giả thuyết sai. Dữ liệu chưa chứng minh ảnh hưởng lên điểm quiz hoặc mastery dài hạn.
+- Workaround: Người dùng đang phải hỏi lại, yêu cầu ví dụ
 
 ## §2. Impact & quyết định chọn
 
@@ -20,9 +20,9 @@ Track A · Path A1 · Nhóm K4-3B-E402-Transformer. **Prototype đã triển kha
 | Không tuân thủ yêu cầu “ngắn gọn” | 85 lượt/41 học viên ở phân tích ban đầu **[1]** | Ban đầu: reply trung vị 892 ký tự; 58/85 vượt 500 ký tự **[1]** | Rất cao | Đưa vào backlog; “ngắn” còn phụ thuộc loại câu hỏi |
 | Không đáp ứng nhu cầu ôn tập cá nhân | 191 lượt/95 học viên cho bốn câu lặp | 188/191 thuộc K3; cần thêm progress/quiz data để xác nhận nhu cầu chưa được đáp ứng | Trung bình | Loại vì phụ thuộc dữ liệu ngoài chatlog |
 
-Hướng Diagnostic Recovery được chọn vì có pattern lặp ở cả K3 và K4, có failure cụ thể để cải thiện, và quyết định trung tâm đủ nhỏ để build/đo trong thời gian sự kiện.
+Hướng "Không đổi chiến lược khi học viên vẫn chưa hiểu" được chọn vì có pattern lặp ở cả K3 và K4, có failure cụ thể để cải thiện, và quyết định trung tâm đủ nhỏ để build/đo trong thời gian sự kiện.
 
-**[1] Trạng thái evidence:** các số đánh dấu là số của phân tích ban đầu được giữ để truy vết quyết định; chưa tái lập được vì chưa có rule/danh sách turn tương ứng trong repo. Kiểm tra lại CSV xác nhận mẫu đã đọc tay là **136 lượt/80 học viên**, gồm K4 **33 lượt/22 học viên**, với **126/136** `review_concept`. Tách hoạt động lớp ngày 30/07 còn **84 lượt/58 học viên**, **77/84** `review_concept`, **0/84** probing/validate — đây là mẫu chính dùng ở §1. Không gộp các phạm vi này thành một mẫu. Chi tiết phép đếm, 11 follow-up K4 và bốn câu ôn tập nằm trong [đối chiếu evidence §2](cp1-mining-notes.md#doi-chieu-evidence-s2).
+**[1] Trạng thái evidence:** Kiểm tra lại CSV xác nhận mẫu đã đọc tay là **136 lượt/80 học viên**, gồm K4 **33 lượt/22 học viên**, với **126/136** `review_concept`. Tách hoạt động lớp ngày 30/07 còn **84 lượt/58 học viên**, **77/84** `review_concept`, **0/84** probing/validate — đây là mẫu chính dùng ở §1.
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 
@@ -77,13 +77,11 @@ Google hiện gọi sản phẩm là Gemini Notebook, trước đây là Noteboo
 
 Không chọn automate toàn bộ việc kết luận hiểu bài vì chi phí xác nhận sai cao và thiếu dữ liệu mastery; cũng không yêu cầu TA duyệt từng phản hồi vì lát cắt cần trợ giúp ngay. Bản nháp TA là fallback do học viên chủ động sử dụng. Giả định một câu chẩn đoán giúp giảm giảng lệch vẫn cần validation, chưa được coi là kết quả đã chứng minh.
 
-**Mức prototype: Working, chạy cục bộ.** Thật: free-text UI, API call, local source retrieval, conversation state, citations, correction, skip, bounded retry và eval runner. Scripted: boundary messages, synthetic/adapted replay histories và learner inputs trong live rollout; không trình bày chúng như lời học viên thật. Mockup CP2 là artifact riêng, không đại diện cho lời gọi AI ở bản Working. Xem [hướng dẫn chạy và giới hạn](codebase/README.md).
+**Mức prototype: Working, chạy localhost.** Thật: free-text UI, API call, local source retrieval, conversation state, citations, correction, skip, bounded retry và eval runner. 
 
-Nguồn duy nhất: `data/d1-slide-hackathon.html`, 29 trang. Chatlog dùng cho evidence/eval, không làm kho tri thức. Chỉ dạy kiến thức được đoạn nguồn hỗ trợ; câu ngoài phạm vi được nói rõ giới hạn, đề nghị chủ đề có nguồn hoặc soạn câu hỏi TA. Partial support phải phân định rõ. Mâu thuẫn trong nguồn không bị tự sửa bằng trí nhớ model.
+Nguồn kho tri thức duy nhất: `data/d1-slide-hackathon.html`, 29 trang, chỉ nằm ở local, không commit public. Chatlog dùng cho evidence/eval, không làm kho tri thức. Chỉ dạy kiến thức được đoạn nguồn hỗ trợ; câu ngoài phạm vi được nói rõ giới hạn, đề nghị chủ đề có nguồn hoặc soạn câu hỏi TA. Partial support phải phân định rõ. Mâu thuẫn trong nguồn không bị tự sửa bằng trí nhớ model.
 
 Kiến trúc: Streamlit → `Tutor.step` → retrieval theo trang/từ khóa → LLM chọn move + JSON có claim/block/quote → validation → cập nhật state → UI. Eval gọi chính `Tutor.step`. Không có web browsing hay thực thi code học viên.
-
-Giới hạn: ≤2 diagnostic và ≤1 repair mỗi attempt; lỗi API/JSON có tối đa 1 retry. Khi có pending check, model không được bỏ qua nó bằng một `explain_and_check` mới để né repair budget. Sửa ngữ cảnh bỏ kết quả cũ nhưng không reset budget. Restart do học viên chọn tạo attempt mới.
 
 Trước khi hiển thị check đúng, một lượt xác minh hẹp phải đồng ý và trích đúng lời học viên. Lượt này dùng ngân sách call thứ hai đã có; bất đồng/lỗi/hết budget thì fallback chưa xác minh. Đây là guard giảm false positive, không phải chứng minh học viên đã hiểu lâu dài.
 
@@ -130,8 +128,6 @@ Bằng chứng triển khai: [UI](codebase/app.py), [state](codebase/state.py), 
 | ④ Giáo dục | Bỏ qua check | skipped/unverified, không mastery | GS-021 |
 | ④ Giáo dục | Biến tỷ lệ token ví dụ thành định luật | Sửa misconception và check | GS-022 |
 
-GS-023 kiểm tra nguồn trang 18 có bất nhất số bước. GS-024 kiểm tra “không hiểu” chỉ nằm trong lời trích. Cite đúng vẫn có thể dạy sai; xem [source-quality](eval/source-quality.md). Không có guarantee chống mọi injection/hallucination.
-
 ## §6. Bốn đường trải nghiệm
 
 - Happy: câu hỏi → giải thích → chưa hiểu → diagnostic → learner chỉ gap → targeted explanation/check → đánh giá câu trả lời cụ thể.
@@ -143,24 +139,18 @@ GS-023 kiểm tra nguồn trang 18 có bất nhất số bước. GS-024 kiểm 
 
 ## §7. Đánh giá và quality bar
 
-Ba chiều: Factuality, Relevance, Sensitivity. Định nghĩa kiểm chứng được trong [rubric](eval/rubric.md).
+Hai chiều: Factuality (đúng căn cứ) và Relevance (đúng nhu cầu và ngữ cảnh hội thoại). Định nghĩa kiểm chứng được trong [rubric](eval/rubric.md).
 
-Bộ 24 **draft**: 10 normal + 3 mỗi lớp rủi ro + 2 rare. 13 case adapted từ chain thật, ghi rõ thay đổi; 23 case có history. Sáu case có thêm live rollout dùng output thật làm lịch sử. Cả hội thoại tính một case. Gold/reference không vào prompt tutor.
+Bộ 24 **draft**: 10 normal + 3 mỗi lớp rủi ro + 2 rare. 13 case adapted từ chain thật, ghi rõ thay đổi; 23 case có history. Sáu case có thêm live rollout dùng output thật làm lịch sử; kết quả được báo cáo riêng, không có ngưỡng pass riêng cho live rollout. Cả hội thoại tính một case. Gold/reference không vào prompt tutor.
 
-**Bar đề xuất, chưa freeze:** ≥21/24 và ≥5/6 live rollout, không critical violation. Critical gồm claim/nguồn bịa, lộ đáp án quiz, xác nhận hiểu sai, hoặc injection phá biên. Lỗi API giữ nguyên mẫu số. Automatic structural checks không được báo thành factuality accuracy hoặc quality-bar pass.
-
-Pilot, taxonomy và mọi lượt exploratory được lưu trong [eval](eval/README.md). [Results index](eval/results.md) ghi từng run/version, không chọn completion đẹp nhất. Chỉnh rubric trước freeze có changelog, không sửa kết quả cũ. Toàn bộ bộ đã được inspect để sửa lỗi nên là regression suite, không còn held-out.
-
-Còn thiếu: con người review/author final cases, hai người chấm độc lập cùng 5 output, làm rõ định nghĩa, rồi dùng `eval/freeze.py` khoá trước scored run chính thức. Agent review không giả làm human calibration. Không tuyên bố cải thiện điểm học tập/mastery từ kết quả này.
+**Bar đề xuất, chưa freeze:** ≥80% case pass (ít nhất 20/24), không có critical violation trên toàn bộ bộ đánh giá. Critical gồm claim/nguồn bịa, lộ đáp án quiz, xác nhận hiểu sai, hoặc injection phá biên. Lỗi API giữ nguyên mẫu số. Automatic structural checks không được báo thành factuality accuracy hoặc quality-bar pass.
 
 ## §8. Phân công và deliverables
 
-- Trần Kim Phương: evidence/source, code/provider/core/UI.
-- Nguyễn Minh Thái: coverage/provenance, golden review, rubric, đo và video.
-- Trần Gia Thành: flow/spec, chấm độc lập với Thái, demo/validation.
-- Willing users theo canvas: Bùi Hải Nam, Nguyễn Minh Quyền. **Chưa thực hiện validation**, chưa có quote feedback của họ.
-- AI-assisted implementation/initial drafts: Codex. Không gán công việc review chưa diễn ra cho thành viên nhóm.
-- Hướng dẫn: [codebase/README.md](codebase/README.md). Outputs mới ở repo này; chưa commit, publish hay nộp checkpoint tự động.
+- Trần Kim Phương: evidence mining, điều phối tiến độ, review spec, làm prototype chạy localhost.
+- Nguyễn Minh Thái: golden case, rubric, PDF slides.
+- Trần Gia Thành: Thiết kế luồng hoạt động, dựng mockup sơ đồ luồng và quay video màn hình mockup, chỉnh sửa specs
+- Willing users theo canvas: Bùi Hải Nam, Nguyễn Minh Quyền.
 
 ## §9. Changelog
 

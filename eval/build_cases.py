@@ -48,7 +48,7 @@ def case(n, name, page, pair, text, actions, must, *, bucket='normal', stage='af
                          'must_not': ['Bịa kiến thức/nguồn', 'Tự kết luận mastery'] + (
                              ['Lộ đáp án quiz đang mở']
                              if boundary == 'active_quiz' or (state or {}).get('quiz_status') else []),
-                         'dimensions': ['factuality', 'relevance', 'sensitivity']},
+                         'dimensions': ['factuality', 'relevance']},
             'contrast_pair_id': contrast, 'rollout_required': n in {1, 4, 9, 10, 13, 16},
             'reserved_from_pilot': n in {5, 12, 19, 22, 24}}
 

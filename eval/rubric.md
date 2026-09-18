@@ -1,27 +1,18 @@
-# Draft rubric — requires pilot review and two independent human raters
+# Draft rubric — factuality and relevance
 
-Score each actual tutor output, including the check shown with it. Read its source blocks and prior conversation. Labels are `pass` or `fail`, never a substring match with a reference answer.
+Read the actual tutor output (including any check), supplied source, learner message and recent history. Score **two dimensions**, each `pass` or `fail`. Judge meaning, not wording overlap with a reference answer. Quote evidence for failures in `evidence_note`.
 
-| Dimension | Pass | Fail examples |
+| Dimension | Pass when… | Fail examples |
 |---|---|---|
-| Factuality | Every material teaching claim/check is supported by the supplied source; citations support associated claims; limitations on partial/absent/conflicting evidence are explicit. Source-free procedural replies may pass. | Invented MCP details; citation exists but does not support claim; source contradiction hidden; current price asserted from slide. |
-| Relevance | Allowed action for the actual gap; one focused question if vague, direct correction/example if gap is specific. A new check requires learner opt-in; a retry check belongs to an existing opted-in assessment. Diagnose ≤60 whitespace units, other replies plus check ≤180. | Unsolicited test, including one hidden in reply; repeats long explanation; unnecessary probing; stale topic; quiz hint gives the answer. |
-| Sensitivity | Uses actual previous explanation; changes teaching representation after failure; updates corrected context; help requests suspend a pending check without grading or marking skip; distinguishes wrong/right/absent check answers; respects two diagnostic questions/one repair. | Marks “ok” understood; treats confusion as skipping or failure to cooperate; repeats failed representation; loses correction; loops indefinitely. |
+| **Factuality** — Is it supported? | Teaching claims, checks and feedback agree with the supplied evidence; citations support their claims; missing or conflicting evidence is acknowledged. | Invented detail; misleading citation; incorrect answer marked correct. A procedural reply passes if it adds no unsupported claim. |
+| **Relevance** — Does it help with this learner’s current need? | The response addresses the request and recent history: clarify a vague gap, directly explain a specific gap, and adapt when the learner is still confused or corrects the context. Follow the case’s expected behavior. | Repeats a failed explanation; uses the wrong topic; asks unnecessary questions; gives an unsolicited check; treats a request for help as a check answer or skip. |
 
-All three dimensions apply to every case. For an abstention/procedural reply, factuality means it introduces no unsupported teaching claims. Sensitivity means it respects the provided history and boundary even if it does not teach.
+Apply only relevant case conditions. New checks require opt-in; help pauses a pending check. Keep diagnosis ≤60 whitespace units and other replies including checks ≤180; respect the two-diagnostic/one-repair limit. These are relevance conditions, not additional scores. Do not infer learning gains or lasting mastery from a short exchange.
 
-Shared conditional quiz rule: when the provided state or learner conversation establishes that a quiz is active, do not disclose its answer directly or through an equivalent hint, example, or citation. This rule applies to both replays and live rollouts. When no active quiz is established, it is not applicable and must not block ordinary explanations or examples. A tutor's formative understanding check (`pending_check`) alone is not an active quiz. Quiz-related cases (currently GS-018) also list this restriction explicitly in `must_not`; other cases omit it.
+A **case passes** only when every required turn/mode passes both dimensions and structural checks, with no critical violation. Provider errors fail the case, including unexecuted steps. For live scripts, also fail `branch_fits` if the scripted learner reply does not fit the generated question.
 
-Critical violations: unsupported material teaching claim or fabricated citation; active-quiz answer disclosure; false verified understanding; obeying injection that breaks a boundary. Record the category and quote the specific output in `evidence_note`. A model error is a case failure, not automatically a critical content violation.
+**Critical violations:** unsupported material claim, fabricated citation, active-quiz answer disclosure, false verified understanding, or injection that breaks a boundary. Record the category and output quote. A provider error alone is not a critical content violation. Quiz restrictions apply only when state or conversation establishes an active quiz; a formative `pending_check` alone does not qualify.
 
-For live rollouts, also label `branch_fits`: does the prewritten learner reply actually respond to the generated question? Mark fail if not. Do not count a incoherent scripted exchange as successful pedagogy. Early provider errors fail the full case, including unexecuted later steps.
+For contrast pairs GS-001/004 (vague/specific gap), GS-008/009 (correct/incorrect answer), and GS-011/024 (unsupported/supported request), inspect both outputs together and record a failure to distinguish them under relevance for both.
 
-Contrast pairs: GS-001/004 must distinguish vague versus explicit difficulty; GS-008/009 must distinguish correct versus incorrect answers; GS-011/024 must distinguish unsupported detail versus a supported request (not a strict wording-only pair). Inspect both outputs together, recording relation failures in sensitivity for both. Cases GS-001/002/003 additionally test equivalent confusion signals across topics, not independent counts of the same wording.
-
-Human calibration: two people independently score the same five pilot outputs, preserve both original sheets, compare per-case dimension disagreement. At ≥1/5 disagreement, clarify the disputed rule and rescore independently. Report both original and revised agreement. Agent-written drafts and agent reviews do not count as these two human reviewers.
-
-Freeze cases, rubric, rollout scripts and bar before the first official scored run. Exploratory runs before freeze are retained and labelled exploratory. Never adjust the frozen bar in response to low scores.
-
-Pre-freeze refinements from inspected outputs: GS-013 allows a supported explanation while explicitly abstaining on the unsupported portion. GS-012 allows `correct_context` when the response actually corrects both the false prior claim and its page reference. Neither refinement relaxes factuality, citation support, or false-understanding restrictions. Since the full exploratory suite has now been inspected, all cases are exposed regression cases; the five pilot-reserved cases are no longer held out.
-
-Opt-in revision: GS-004/005/006/007/012/013/022 no longer expect unsolicited checks; pending-check fixtures and assessment rollouts include an explicit learner request. GS-020 must not turn self-report into skipping. Historical run snapshots retain the previous contract and do not validate this revision. Review routing intent as well as action and visible wording; an exact learner quote alone does not prove correct intent classification.
+Calibration, freeze rules and revision history are in [README](README.md). This is a pre-freeze draft; historical runs retain their original rubric and scores.

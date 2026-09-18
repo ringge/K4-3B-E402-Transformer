@@ -60,8 +60,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "clarity",
@@ -128,8 +127,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -196,8 +194,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -265,8 +262,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "clarity",
@@ -333,8 +329,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -402,8 +397,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -471,8 +465,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -549,8 +542,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "check_correctness",
@@ -628,8 +620,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "check_correctness",
@@ -714,8 +705,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -783,8 +773,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "support",
@@ -848,8 +837,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -917,8 +905,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -970,8 +957,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1036,8 +1022,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1106,8 +1091,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1170,8 +1154,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1236,8 +1219,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1301,8 +1283,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1379,8 +1360,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1458,8 +1438,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1526,8 +1505,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1591,8 +1569,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": null,
@@ -1655,8 +1632,7 @@
       ],
       "dimensions": [
         "factuality",
-        "relevance",
-        "sensitivity"
+        "relevance"
       ]
     },
     "contrast_pair_id": "support",

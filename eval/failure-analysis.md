@@ -3,7 +3,7 @@
 Candidate: [20260918T075456Z-exploratory-candidate-5a022e](runs/20260918T075456Z-exploratory-candidate-5a022e/report.md).
 Baseline: [20260918T075048Z-exploratory-baseline-020ae4](runs/20260918T075048Z-exploratory-baseline-020ae4/report.md).
 
-Both variants used matching contract hashes and the final shared core, running sequentially with two case workers. **20/24 candidate versus 13/24 baseline automatic structural passes.** These checks are not semantic accuracy or an official scored evaluation. With four case failures, the latest candidate does not reach the proposed minimum 21/24 even before human grading.
+Both variants used matching contract hashes and the final shared core, running sequentially with two case workers. **20/24 candidate versus 13/24 baseline automatic structural passes.** These checks are not semantic accuracy or an official scored evaluation. With four case failures, this candidate did not reach its saved minimum of 21/24 even before human grading. The current proposed bar is ≥80% (20/24) with zero critical violations and no separate live-rollout pass quota; this historical run is not rescored under the revised contract.
 
 | Case | Actual observed failure | Implication / next improvement |
 |---|---|---|
