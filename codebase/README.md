@@ -42,12 +42,12 @@ The configured compatible provider is the primary integration; native Gemini and
 
 1. Select page 10 and ask “LLM khác chatbot thế nào?”.
 2. Say “Không hiểu.” The tutor should ask one focused diagnostic question.
-3. Say “Mình tưởng LLM chính là chatbot.” It should explain the specific distinction differently and ask a small check.
-4. Answer that check. Only a correct answer to a pending check may mark that one concept verified. “Ok hiểu rồi” is not proof.
+3. Say “Mình tưởng LLM chính là chatbot.” It should explain the specific distinction differently, without adding a test.
+4. Click **Tự kiểm tra** or ask “Hỏi mình một câu để kiểm tra mức hiểu.” Only this opt-in starts a check. Answer it, or say “Mình chưa hiểu” / request an example to return to teaching. Returning to help clears the pending check without grading or marking it skipped. A later check needs fresh opt-in. Only a correct answer to a pending check may mark that one concept verified; “Ok hiểu rồi” is not proof.
 5. Try “Ý mình là trang 13 nói token.” The app should update the lesson selection and discard the old check.
 6. Ask about MCP or detailed late chunking; the tutor should disclose the limits of Day 1. Open the citation expanders to inspect support.
 
-The learner can skip, restart, correct context, or prepare an unsent TA question. Two diagnostic questions and one repair are allowed per attempt. A provider error preserves state and offers retry; it never becomes a fake tutor answer.
+The learner can skip, restart, correct context, or prepare an unsent TA question. Checks are optional; ordinary help does not repeatedly display an unverified status. Only an explicit skip request marks a check skipped. Two diagnostic questions and one repair are allowed per attempt; returning to help does not reset those budgets. A provider error preserves state and offers retry; it never becomes a fake tutor answer.
 
 ## Architecture and limits
 
@@ -62,10 +62,11 @@ The **app** sidebar entry remains the live chat. Replay results and state are se
 ### Components
 
 - `knowledge.py`: exact page/block IDs, source checksum, local lexical retrieval with selected-page context and topic aliases. No web or vector database.
-- `tutor.py`: real LLM chooses action/response, then schema/evidence/state validation before display. The app validates source identity and literal quotations; human evaluation must still judge claim entailment.
+- `turns.py`: one independent semantic routing call for free text distinguishes help, check answers, explicit opt-in, and skipping using recent history and a verbatim learner quote. Trusted UI buttons bypass routing. Malformed routing fails without changing the conversation. Classification can still be wrong; it requires live regression review, not only unit tests.
+- `tutor.py`: the router supplies check permission; the response generator cannot grant itself permission or choose skip. Help requests clear the pending check before generation, without grading. Schema/evidence/state validation runs before display. The app validates source identity and literal quotations; human evaluation must still judge claim entailment and whether reply text follows the teaching policy.
 - Before showing a correct understanding-check result, a separate focused model assessment must agree and quote the learner's actual answer. It uses the existing second-call budget; disagreement, malformed verification, or an exhausted budget produces an unverified fallback. This reduces false positives but is not a proof of learning.
 - `state.py`: pending check, correction, counters, and understanding state. No persistent student profile.
-- `model_client.py`: HTTP provider adapter; secrets stay in server-side headers; at most two model attempts per tutor turn, no silent unlimited retries.
+- `model_client.py`: HTTP provider adapter; secrets stay in server-side headers. Free-text turns use at most three calls: one routing call plus the existing two-call teaching/retry/verification budget. Buttons bypass routing, so use at most two; explicit skip and active-quiz guards can use zero. Routing adds latency/cost and has no automatic retry.
 - `app.py`: free-text Vietnamese chat, lesson/source panel, citation expanders, clear missing-configuration state. Conversation and developer trace stay only in the Streamlit session.
 - `pages/1_Replay_tests.py`: isolated manual replay page, using the CLI replay function with saved case history/state. Expected behaviors are displayed for review and never sent to the tutor.
 - `../eval/`: draft cases with provenance, real pilot/exploratory traces, review sheets, calibration, freeze, and scoring tools. Replay runs supply the case history/state/input; grading criteria are never loaded into the tutor prompt.

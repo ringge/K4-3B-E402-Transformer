@@ -96,16 +96,17 @@ for message in state.messages:
 if state.check_result == 'correct':
     st.success('Câu trả lời vừa kiểm tra đúng với ý chính của bài. Đây chưa phải đánh giá toàn bộ mức hiểu.')
 elif state.check_result == 'skipped':
-    st.info('Đã bỏ qua kiểm tra · chưa xác nhận mức hiểu.')
+    st.caption('Đã bỏ qua câu kiểm tra.')
 elif state.pending_check:
-    st.caption('Đang chờ câu trả lời cho câu kiểm tra ngắn ở trên.')
+    st.caption('Bạn có thể trả lời câu kiểm tra, hỏi thêm hoặc bỏ qua.')
 
-buttons = st.columns(3)
+buttons = st.columns(4)
 requested = None
 for col, label, text, intent in [
-    (buttons[0], 'Mình chưa hiểu', 'Mình chưa hiểu.', 'chat'),
-    (buttons[1], 'Cho ví dụ', 'Cho mình một ví dụ minh hoạ dễ hiểu cho ý vừa nói.', 'chat'),
-    (buttons[2], 'Bỏ qua kiểm tra', 'Bỏ qua kiểm tra.', 'skip'),
+    (buttons[0], 'Mình chưa hiểu', 'Mình chưa hiểu.', 'help'),
+    (buttons[1], 'Cho ví dụ', 'Cho mình một ví dụ minh hoạ dễ hiểu cho ý vừa nói.', 'example'),
+    (buttons[2], 'Tự kiểm tra', 'Cho mình một câu hỏi để tự kiểm tra mức hiểu về ý vừa học.', 'check'),
+    (buttons[3], 'Bỏ qua kiểm tra', 'Bỏ qua kiểm tra.', 'skip'),
 ]:
     if col.button(label, use_container_width=True, disabled=bool(config_error) or (intent == 'skip' and state.pending_check is None)):
         requested = (text, intent)

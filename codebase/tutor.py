@@ -14,6 +14,7 @@ from codebase.config import ROOT
 from codebase.knowledge import Knowledge, normalize
 from codebase.model_client import ModelClient, ModelError
 from codebase.state import Message, StrictModel, TutorResponse, TutorState
+from codebase.turns import ROUTE_PROMPT, TurnRoute
 
 
 class UnderstandingVerdict(StrictModel):
@@ -52,7 +53,7 @@ def is_self_report(text):
         re.fullmatch(r'(?:ok\s+)?(?:minh\s+)?hieu roi.*(?:danh dau|xac nhan).*', cleaned))
 
 
-def validate_response(response, state, text, pages, knowledge):
+def validate_response(response, state, text, pages, knowledge, turn_intent='other'):
     supplied = {p.source_id for p in pages}
     if not set(response.source_ids) <= supplied:
         raise InvalidResponse('citation_not_supplied')
@@ -76,6 +77,17 @@ def validate_response(response, state, text, pages, knowledge):
         raise InvalidResponse('missing_understanding_check')
     if state.pending_check is not None and response.action in {'answer', 'explain_and_check'}:
         raise InvalidResponse('pending_check_requires_assessment')
+    if response.action == 'skip':
+        # Skipping is a learner decision, handled before response generation.
+        raise InvalidResponse('skip_requires_learner_request')
+    if response.action == 'explain_and_check' and turn_intent != 'request_check':
+        raise InvalidResponse('check_requires_opt_in')
+    if response.action == 'repair_and_check' and turn_intent != 'check_answer':
+        raise InvalidResponse('repair_requires_check_answer')
+    if response.check_assessment != 'not_applicable' and turn_intent != 'check_answer':
+        raise InvalidResponse('assessment_requires_check_answer')
+    if response.action == 'answer' and '?' in response.reply:
+        raise InvalidResponse('question_in_answer')
     if response.check and response.action not in {'explain_and_check', 'repair_and_check'}:
         raise InvalidResponse('unexpected_check')
     if response.action == 'feedback' and state.pending_check is None:
@@ -152,15 +164,17 @@ class Tutor:
         if variant not in {'candidate', 'baseline'}:
             raise ValueError('Unknown prompt variant')
         self.knowledge, self.client, self.variant = knowledge, client, variant
-        common = (ROOT / 'codebase/prompts/common.md').read_text()
-        policy = (ROOT / f'codebase/prompts/{"tutor" if variant == "candidate" else "baseline"}.md').read_text()
+        common = (ROOT / 'codebase/prompts/common.md').read_text(encoding='utf-8')
+        policy = (ROOT / f'codebase/prompts/{"tutor" if variant == "candidate" else "baseline"}.md').read_text(encoding='utf-8')
         self.system = common + '\n\n' + policy
         self.prompt_hash = sha256(self.system.encode()).hexdigest()
+        self.route_prompt_hash = sha256(ROUTE_PROMPT.encode()).hexdigest()
 
     def step(self, state: TutorState, user_input: str, selected_page=None, intent='chat'):
         start = time.monotonic()
         trace = {'timestamp': datetime.now(timezone.utc).isoformat(), 'variant': self.variant,
                  'prompt_sha256': self.prompt_hash, 'source_sha256': self.knowledge.sha256,
+                 'route_prompt_sha256': self.route_prompt_hash,
                  'input': user_input, 'intent': intent, 'state_before': state.model_dump(mode='json'),
                  'retrieved_ids': [], 'attempts': [], 'guard': None}
         working = state.model_copy(deep=True)
@@ -176,7 +190,7 @@ class Tutor:
         local = None
         # Explicit controls travel through the same entry point in UI and evaluator.
         if intent == 'skip' or re.fullmatch(r'(minh )?(bo qua|bo qua kiem tra|khong muon kiem tra)[.!]?', normalized):
-            local = fixed_response('skip', 'Mình sẽ bỏ qua câu kiểm tra này. Mức hiểu của bạn chưa được xác nhận; bạn có thể tiếp tục hoặc quay lại sau.', 'learner_skip')
+            local = fixed_response('skip', 'Mình đã bỏ qua câu kiểm tra. Bạn có thể tiếp tục hỏi về bài học.', 'learner_skip')
         elif intent == 'correct':
             local = fixed_response('correct_context', 'Mình đã bỏ kết quả kiểm tra cũ. Bạn muốn làm rõ ý nào ở trang đang chọn?', 'explicit_context_correction')
             local.corrected_page = selected_page if selected_page is not None else working.active_page
@@ -189,8 +203,48 @@ class Tutor:
         if local:
             trace['guard'] = local.reason_code
             return self._finish(local, working, text, trace, start)
+        # Trusted UI controls bypass semantic routing. Free text gets one bounded,
+        # independent classification call; the response generator cannot opt itself in.
+        turn_intent = {'help': 'help', 'example': 'help', 'check': 'request_check'}.get(intent)
+        if turn_intent is None:
+            if intent != 'chat':
+                return StepResult(None, state, trace, 'Thao tác không hợp lệ.')
+            entry = {'number': 1, 'kind': 'turn_routing'}
+            trace['attempts'].append(entry)
+            try:
+                completion = self.client.complete(ROUTE_PROMPT, {
+                    'user_input': text,
+                    'pending_check': working.pending_check.model_dump() if working.pending_check else None,
+                    'history': [m.model_dump() for m in working.messages[-6:]],
+                    'response_schema': TurnRoute.model_json_schema(),
+                })
+                entry.update(raw_output=completion.text, usage=completion.usage, request_id=completion.request_id)
+                route = TurnRoute.model_validate_json(completion.text)
+                if not route.learner_quote.strip() or route.learner_quote not in text:
+                    raise InvalidResponse('intent_quote_not_in_input')
+                if route.intent == 'check_answer' and working.pending_check is None:
+                    raise InvalidResponse('check_answer_without_check')
+                turn_intent = route.intent
+            except (ModelError, ValidationError, InvalidResponse) as exc:
+                entry['error'] = exc.code if isinstance(exc, ModelError) else (
+                    str(exc) if isinstance(exc, InvalidResponse) else 'invalid_intent_schema')
+                trace.update(status='error', state_after=state.model_dump(mode='json'),
+                             latency_ms=round((time.monotonic() - start) * 1000))
+                return StepResult(None, state, trace, 'Chưa thể xác định yêu cầu. Hội thoại được giữ nguyên; bạn có thể thử lại.')
+        trace['turn_intent'] = turn_intent
+        if turn_intent == 'skip':
+            trace['guard'] = 'learner_skip'
+            return self._finish(fixed_response('skip', 'Mình đã bỏ qua câu kiểm tra. Bạn có thể tiếp tục hỏi về bài học.', 'learner_skip'), working, text, trace, start)
+        if turn_intent in {'help', 'request_check'}:
+            # Returning to teaching ends this check without grading or implying skip.
+            # A later assessment needs fresh opt-in; budgets and lesson context survive.
+            trace['check_suspended'] = working.pending_check is not None
+            working.pending_check = None
+            working.check_result = 'unverified'
         state_payload = working.model_dump(mode='json', exclude={'messages', 'attempt_id'})
         payload = {'user_input': text, 'state': state_payload,
+                   'turn_policy': {'intent': turn_intent, 'new_check_allowed': turn_intent == 'request_check',
+                                   'check_suspended': trace.get('check_suspended', False)},
                    'history': [m.model_dump() for m in working.messages[-12:]],
                    'evidence': [p.evidence() for p in pages],
                    'inventory': [{'page': p.file_page, 'title': p.title} for p in self.knowledge.pages.values()],
@@ -198,21 +252,21 @@ class Tutor:
         if trace.get('context_changed'):
             payload['context_notice'] = 'Learner selected a different page; the old check is invalid. Address the new selected page.'
         for attempt in range(2):
-            entry = {'number': attempt + 1}
+            entry = {'number': len(trace['attempts']) + 1, 'kind': 'teaching'}
             trace['attempts'].append(entry)
             try:
                 completion = self.client.complete(self.system, payload)
                 entry.update({'raw_output': completion.text, 'usage': completion.usage,
                               'request_id': completion.request_id})
                 response = TutorResponse.model_validate_json(completion.text)
-                validate_response(response, working, text, pages, self.knowledge)
+                validate_response(response, working, text, pages, self.knowledge, turn_intent)
                 if response.check_assessment == 'correct':
                     # A false-positive check is a critical educational error. A small,
                     # separate assessment must agree before the UI can show verification.
                     # Use the existing second-call budget, never add an unbounded call.
                     verified = False
                     if attempt == 0:
-                        verification = {'number': 2, 'kind': 'understanding_verification'}
+                        verification = {'number': len(trace['attempts']) + 1, 'kind': 'understanding_verification'}
                         trace['attempts'].append(verification)
                         try:
                             assessment = self.client.complete(VERIFY_PROMPT, {
@@ -242,13 +296,18 @@ class Tutor:
                 code = str(exc) if isinstance(exc, InvalidResponse) else 'invalid_json_schema'
                 entry['error'] = code
                 hints = {
-                    'unexpected_check': 'If action=answer and a check is intended, use explain_and_check. Only explain_and_check/repair_and_check may have check. For correct_context, set check=null.',
+                    'unexpected_check': 'Only explain_and_check with turn_policy.new_check_allowed=true, or repair_and_check for a wrong check answer, may have check. Otherwise set check=null and remove any test from reply.',
                     'citation_without_claim': 'For a procedural diagnosis with no teaching claims, set source_ids=[] and claims=[]. Do not add irrelevant claims.',
                     'quote_not_in_source': 'Copy each quote exactly from its referenced evidence block, preserving capitalization and punctuation; do not paraphrase a quote.',
                     'too_many_questions': 'Put one check ONLY in check.question, never in reply. A yes/no stem plus Vì sao is one check; do not include other questions. For a source contradiction, answer/abstain without a check.',
-                    'repair_without_incorrect_answer': 'state.pending_check is present. Evaluate the actual learner answer: if wrong, keep repair_and_check and set check_assessment=incorrect.' if working.pending_check else 'No pending check; use explain_and_check with check_assessment=not_applicable.',
+                    'repair_without_incorrect_answer': 'state.pending_check is present. Evaluate the actual learner answer: if wrong, keep repair_and_check and set check_assessment=incorrect.' if working.pending_check else 'No pending check. Use answer with check=null, unless turn_policy.new_check_allowed=true permits explain_and_check. Set check_assessment=not_applicable.',
                     'pending_check_requires_assessment': 'There is an unanswered state.pending_check. You must assess the learner response to it, not silently replace it. If wrong use repair_and_check + incorrect; if correct use feedback + correct; if unclear use feedback + unclear or diagnose. A changed topic uses correct_context.',
-                    'unearned_understanding': 'Self-report is not evidence. Do not mark correct. Acknowledge that understanding is unverified; ask the pending question again or allow skip.',
+                    'unearned_understanding': 'Self-report is not evidence. Use feedback with unclear; do not mark correct, force another answer, or choose skip. Keep the reply brief and respectful.',
+                    'check_requires_opt_in': 'The learner did not request assessment. Use answer with check=null to explain or give an example; use diagnose only to clarify a vague difficulty. Do not put a test in reply.',
+                    'skip_requires_learner_request': 'The learner did not request skipping. Follow turn_policy: help/diagnosis is not skipping. Do not say they failed to answer or that you skipped.',
+                    'repair_requires_check_answer': 'This turn requests help, not grading. Explain with answer or clarify with diagnose; check=null.',
+                    'assessment_requires_check_answer': 'Do not grade a help request. Set check_assessment=not_applicable and follow turn_policy.',
+                    'question_in_answer': 'answer provides the explanation only. Do not append a test, an invitation to a test, or a question; check=null. diagnose is only for identifying an unclear difficulty.',
                 }
                 payload['rejected_response'] = entry.get('raw_output', '')
                 payload['validation_feedback'] = ('Previous output was rejected: ' + code + '. ' +

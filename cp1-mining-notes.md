@@ -131,6 +131,33 @@ Dữ liệu chưa chứng minh được:
 
 Hướng được chọn có reach đo được thấp hơn pain citation nhưng tạo một quyết định AI đặc thù giáo dục hơn và có thể đánh giá rõ trên các chuỗi thất bại thật.
 
+<a id="doi-chieu-evidence-s2"></a>
+
+## Đối chiếu evidence cho spec §2 — 18/09/2026
+
+Nguồn kiểm tra: `data/vlearn-pack/chatlog/tutor_turns.csv` trong data pack của đề, bản xuất 15/09/2026; SHA-256 `265fb13cd17168f9e4c9a886de477856d38e777fa2dc7f6b5d2f9c3bb03597cd`. Đếm một lượt theo row/`turn_id`, học viên theo `student`, chỉ lấy `is_preset=False` (10.427/13.494 lượt). Các phép đếm toàn kỳ dưới đây có gồm 30/07; mẫu chính của pain được chọn vẫn tách ngày này theo data dictionary.
+
+| Số trong bảng đề xuất | Kết quả kiểm tra CSV |
+|---|---|
+| 127 lượt/76 học viên; K4 30/21; 117/127 `review_concept` | Chưa tìm thấy rule hoặc danh sách turn tái lập nhóm này. Áp dụng regex và 17 mã loại trong phương pháp mining ở trên thu được 136 lượt/80 học viên, 126 `review_concept`; riêng K4 33 lượt/22 học viên, 29 `review_concept`. Ngoài 30/07: 84 lượt/58 học viên, 77 `review_concept`, 0 probing/validate. |
+| K4 follow-up gần: 0 probing, reply trung vị 1.353 ký tự | Xác nhận trên 11 lượt yêu cầu thích ứng trong 10 chuỗi K4 đã giữ bên trên: 7 `review_concept`, 4 `give_example`, 0 `ask_probing_question`/`validate_understanding`; trung vị `reply_len` = 1.353. |
+| 3.552 lượt thiếu nguồn theo rule bảo thủ | Chưa có định nghĩa rule gốc để xác nhận. Chỉ lọc `has_citation=False` cho 3.609 lượt. Thêm điều kiện reply không khớp regex `\[trang\s+\d+` (không phân biệt hoa thường) cho 3.551 lượt. Đây là hai phép đếm khác nhau; không tự đổi rule để khớp 3.552. Thiếu nhãn citation không chứng minh câu trả lời sai. |
+| 85 lượt/41 học viên; median 892; 58/85 vượt 500 ký tự | Chưa có rule/danh sách turn tái lập phân tích ban đầu. Tìm literal “ngắn gọn” không phân biệt hoa thường trong toàn bộ `student_question` cho 71 lượt/36 học viên, median 1.056, 61/71 vượt 500 ký tự. Phép tìm này có thể khớp cả tiền tố/đoạn trích, chưa phải mẫu đã xác nhận vi phạm yêu cầu. |
+| 191 lượt/95 học viên; 188/191 K3 | Xác nhận bằng cách lấy dòng cuối `student_question`, bỏ khoảng trắng hai đầu, khớp chính xác một trong bốn câu dưới đây. K4 có 3 lượt. Tần suất câu hỏi chứng minh nhu cầu, chưa đủ chứng minh tutor không đáp ứng. |
+
+11 turn K4 dùng tính follow-up: `T11086`, `T10480`, `T10816`, `T11624`, `T10927`, `T10928`, `T10962`, `T13062`, `T12535`, `T12357`, `T12910`. Đây là các lượt yêu cầu thích ứng đã giữ trong chuỗi; không lấy mọi lượt sau đó như lời sửa ngữ cảnh `T12536`. Quy tắc ghép chuỗi là cùng học viên/course, cách lượt trước tối đa 30 phút và đã đọc để giữ cùng chủ đề.
+
+Bốn câu ôn tập khớp chính xác:
+
+| Câu hỏi | Lượt | Turn ví dụ |
+|---|---:|---|
+| Dựa trên tiến độ của mình, mình nên ôn phần nào trước? | 86 | `T04223` |
+| Mình đang yếu ở những đơn vị kiến thức nào? | 43 | `T04222` |
+| Những ngày học nào mình chưa hoàn thành? | 37 | `T04259` |
+| Giải thích lại giúp mình phần mà mình hay thấy khó. | 25 | `T04224` |
+
+Đã đọc lại nội dung các failure/counterexample `T07024`, `T10927`, `T12535→T12536`, `T10816`, `T13062` trong CSV. `T12536` có lời tutor nhận đã hiểu nhầm ngữ cảnh; `T10816` sửa gap cụ thể; `T13062` đổi sang phép so sánh dù nhãn vẫn là `review_concept`. Vì vậy, nhãn move và độ dài là tín hiệu để chọn lát cắt, không phải thước đo trực tiếp của hiểu bài hay chất lượng sư phạm.
+
 ## JTBD và current workaround
 
 - Job statement: **Xác định đúng điểm mình đang hiểu sai hoặc còn thiếu để tiếp tục học phần hiện tại.**
