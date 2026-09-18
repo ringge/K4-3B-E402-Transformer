@@ -163,8 +163,7 @@ Bộ 24 **draft**: 10 normal + 3 mỗi lớp rủi ro + 2 rare. 13 case adapted 
 | 18/09/2026 | Partial/correction allowlist trước freeze | GS-013/012; giữ snapshot cũ |
 | 18/09/2026 | Retry feedback; chặn thay pending check để né counter | Exploratory GS-009 |
 | 18/09/2026 | Verifier hẹp trước khi đánh dấu check correct | Run 7d57e0 GS-009/010 có false-positive praise; giữ lỗi làm evidence |
-| 18/09/2026 | Hoàn thiện §3–§4: đối chiếu Khanmigo và NotebookLM/Gemini Notebook, chốt lát cắt thiết kế, non-goals, lý do conditional automation và 8 nguyên tắc HAX/PAIR | Tài liệu/demo chính thức dẫn tại §3/§4b; đối chiếu UI/core/prompt hiện có và mining notes. Đây là desk research, chưa phải dùng thử sản phẩm ngoài hoặc validation người dùng. |
-| 18/09/2026 | Thay sản phẩm tham chiếu §3a từ Khanmigo sang ChatGPT; viết lại đủ flow, điều đáng học, điều đáng né và khác biệt | Yêu cầu cập nhật của nhóm; hướng dẫn OpenAI dẫn tại §3a. So sánh flow Chat dùng để học, chưa có thử nghiệm trực tiếp hoặc đo hiệu quả học tập. |
+| 18/09/2026 | Hoàn thiện §3–§4; chọn ChatGPT và NotebookLM/Gemini Notebook làm hai sản phẩm tham chiếu; chốt lát cắt, non-goals, conditional automation và 8 nguyên tắc HAX/PAIR | Tài liệu chính thức dẫn tại §3/§4b, đối chiếu UI/core/prompt hiện có và mining notes. Đây là desk research, chưa phải thử nghiệm đối chứng trực tiếp, đo hiệu quả học tập hoặc validation người dùng. |
 | 18/09/2026 | Làm rõ rủi ro “chưa hiểu → giải thích thẳng, không chẩn đoán” ở cả hai giải pháp tham chiếu; bổ sung ví dụ kiểm thử và điều kiện gap rõ không cần hỏi thêm | Yêu cầu cập nhật của nhóm; evidence VLearn trong mining notes. Ví dụ đối chiếu ChatGPT/NotebookLM chưa chạy, không ghi thành kết quả quan sát. |
 
 Spec còn các mục chờ người thật ở trên; chưa đủ điều kiện gọi là submission hoàn chỉnh.
