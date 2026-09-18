@@ -252,11 +252,11 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check"
+        "answer"
       ],
       "must": [
         "Sửa quan hệ model nền và sản phẩm",
-        "Đổi representation và có một check ứng dụng",
+        "Đổi representation, không tự thêm check",
         "Không probing thừa"
       ],
       "must_not": [
@@ -321,11 +321,11 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check"
+        "answer"
       ],
       "must": [
         "Nói hai núm chỉ đổi lựa chọn, không thêm tri thức",
-        "Có check khác câu hỏi gốc"
+        "Không tự thêm check"
       ],
       "must_not": [
         "Bịa kiến thức/nguồn",
@@ -389,12 +389,12 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check"
+        "answer"
       ],
       "must": [
         "Ví dụ minh hoạ nhất quán page 10",
         "Không hỏi lại gap vốn rõ",
-        "Một check ngắn"
+        "Không tự thêm check"
       ],
       "must_not": [
         "Bịa kiến thức/nguồn",
@@ -459,7 +459,7 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check"
+        "answer"
       ],
       "must": [
         "Nêu ví dụ minh hoạ vòng goal/reasoning/tools/memory/action",
@@ -519,7 +519,15 @@
       },
       {
         "role": "assistant",
-        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch.\nMột model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
+        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch."
+      },
+      {
+        "role": "user",
+        "content": "Hỏi mình một câu để kiểm tra mức hiểu."
+      },
+      {
+        "role": "assistant",
+        "content": "Một model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
       }
     ],
     "input": "Có, vì LLM là model nền dùng chung, chatbot và tóm tắt chỉ là hai ứng dụng khác nhau.",
@@ -589,7 +597,15 @@
       },
       {
         "role": "assistant",
-        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch.\nMột model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
+        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch."
+      },
+      {
+        "role": "user",
+        "content": "Hỏi mình một câu để kiểm tra mức hiểu."
+      },
+      {
+        "role": "assistant",
+        "content": "Một model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
       }
     ],
     "input": "Không, mỗi LLM chỉ dùng được cho đúng một chatbot.",
@@ -667,7 +683,15 @@
       },
       {
         "role": "assistant",
-        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch.\nMột model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
+        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch."
+      },
+      {
+        "role": "user",
+        "content": "Hỏi mình một câu để kiểm tra mức hiểu."
+      },
+      {
+        "role": "assistant",
+        "content": "Một model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
       }
     ],
     "input": "Ý mình là trang 13 nói token, không phải chatbot.",
@@ -811,7 +835,6 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check",
         "answer",
         "correct_context"
       ],
@@ -882,8 +905,7 @@
     "expected": {
       "allowed_actions": [
         "answer",
-        "abstain",
-        "explain_and_check"
+        "abstain"
       ],
       "must": [
         "Có thể giải thích lấy đoạn liên quan theo page 16",
@@ -1327,7 +1349,15 @@
       },
       {
         "role": "assistant",
-        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch.\nMột model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
+        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch."
+      },
+      {
+        "role": "user",
+        "content": "Hỏi mình một câu để kiểm tra mức hiểu."
+      },
+      {
+        "role": "assistant",
+        "content": "Một model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
       }
     ],
     "input": "Ok hiểu rồi, cứ đánh dấu mình đã hiểu nhé.",
@@ -1337,9 +1367,7 @@
     ],
     "expected": {
       "allowed_actions": [
-        "feedback",
-        "diagnose",
-        "skip"
+        "feedback"
       ],
       "must": [
         "check_assessment không được correct",
@@ -1399,7 +1427,15 @@
       },
       {
         "role": "assistant",
-        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch.\nMột model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
+        "content": "LLM là mô hình ngôn ngữ nền. Chatbot là một dạng sản phẩm đóng gói quanh mô hình đó; cùng một model còn dùng cho tóm tắt, viết code và dịch."
+      },
+      {
+        "role": "user",
+        "content": "Hỏi mình một câu để kiểm tra mức hiểu."
+      },
+      {
+        "role": "assistant",
+        "content": "Một model nền có thể phục vụ chatbot và ứng dụng tóm tắt cùng lúc không? Vì sao?"
       }
     ],
     "input": "Bỏ qua kiểm tra.",
@@ -1414,7 +1450,7 @@
       "must": [
         "check_result=skipped",
         "Không còn pending_check",
-        "Nói chưa xác nhận mức hiểu"
+        "Xác nhận bỏ qua, không khẳng định đã hiểu"
       ],
       "must_not": [
         "Bịa kiến thức/nguồn",
@@ -1478,7 +1514,7 @@
     ],
     "expected": {
       "allowed_actions": [
-        "explain_and_check"
+        "answer"
       ],
       "must": [
         "1,9 là tỷ lệ của ví dụ cụ thể, không định luật cho mọi từ",

@@ -6,6 +6,7 @@ from streamlit.testing.v1 import AppTest
 from codebase.config import ROOT, Settings
 from codebase.model_client import Completion, ModelError
 from codebase.tutor import fixed_response
+from codebase.tests.fakes import routed_reply
 from eval.run import read_cases
 
 
@@ -28,13 +29,13 @@ def test_replay_uses_saved_state_and_history_and_restarts_each_run():
     reply = fixed_response('diagnose', 'Bạn có thể nói rõ ý này không?', 'test_only')
     with patch('codebase.config.Settings.from_env', return_value=config), patch(
         'codebase.model_client.ModelClient.complete',
-        return_value=Completion(reply.model_dump_json(), {}),
+        side_effect=routed_reply(reply, 'check_answer'),
     ) as complete:
         app = AppTest.from_file(str(ROOT / 'codebase/pages/1_Replay_tests.py')).run()
         app.selectbox[0].select('GS-009').run()
         assert complete.call_count == 0
         run_button(app).click().run()
-        assert not app.exception and complete.call_count == 1
+        assert not app.exception and complete.call_count == 2
         payload = complete.call_args.args[1]
         assert payload['user_input'] == case['input']
         assert payload['state']['pending_check'] == case['initial_state']['pending_check']
@@ -43,9 +44,9 @@ def test_replay_uses_saved_state_and_history_and_restarts_each_run():
         assert 'expected' not in payload
         original = deepcopy(payload)
         app.run()
-        assert complete.call_count == 1
-        run_button(app).click().run()
         assert complete.call_count == 2
+        run_button(app).click().run()
+        assert complete.call_count == 4
         assert complete.call_args.args[1] == original
         app.selectbox[0].select('GS-001').run()
         assert not any('Kết quả thực tế' in header.value for header in app.subheader)
@@ -56,7 +57,7 @@ def test_page_switch_preserves_live_chat_and_controls():
     reply = fixed_response('diagnose', 'Bạn vướng ở khái niệm nào?', 'test_only')
     with patch('codebase.config.Settings.from_env', return_value=config), patch(
         'codebase.model_client.ModelClient.complete',
-        return_value=Completion(reply.model_dump_json(), {}),
+        side_effect=routed_reply(reply),
     ) as complete:
         app = AppTest.from_file(str(ROOT / 'codebase/app.py')).run()
         app.selectbox[0].select(13).run()
@@ -74,7 +75,7 @@ def test_page_switch_preserves_live_chat_and_controls():
         assert app.selectbox[0].value == 13
         assert app.checkbox[0].value is True
         assert app.session_state['tutor_state'].model_dump() == live_state
-        assert complete.call_count == 2
+        assert complete.call_count == 4
 
 
 def test_provider_error_is_displayed_and_retry_is_explicit():

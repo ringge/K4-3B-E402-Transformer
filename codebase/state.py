@@ -4,8 +4,8 @@ Each tutor response selects exactly one predefined action:
 
 * answer: Answer a clear question without adding an understanding check.
 * diagnose: Ask a focused question to identify the learner's difficulty.
-* explain_and_check: Explain a concept, then ask an understanding check.
-* repair_and_check: Correct a wrong check answer, then check again.
+* explain_and_check: Explain, then ask a learner-requested understanding check.
+* repair_and_check: Correct a wrong answer in an opted-in check, then check again.
 * feedback: Respond to the learner's answer to a pending check.
 * correct_context: Update or clarify the topic or page.
 * skip: Skip the check without confirming understanding.

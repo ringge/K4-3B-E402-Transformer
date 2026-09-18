@@ -19,9 +19,16 @@
       {
         "input": "Mình tưởng LLM chính là chatbot.",
         "allowed_actions": [
+          "answer"
+        ],
+        "must": "Sửa model/sản phẩm, không tự thêm check"
+      },
+      {
+        "input": "Hỏi mình một câu để kiểm tra mức hiểu.",
+        "allowed_actions": [
           "explain_and_check"
         ],
-        "must": "Sửa model/sản phẩm và một check"
+        "must": "Check do học viên yêu cầu"
       },
       {
         "input": "Theo mình, một LLM nền có thể dùng cho chatbot và cả ứng dụng tóm tắt; chatbot chỉ là một sản phẩm.",
@@ -46,9 +53,16 @@
       {
         "input": "Mình tưởng mỗi LLM chỉ dùng cho một chatbot duy nhất.",
         "allowed_actions": [
-          "explain_and_check"
+          "answer"
         ],
         "must": "Đi thẳng misconception, không probing"
+      },
+      {
+        "input": "Cho mình một câu hỏi luyện tập.",
+        "allowed_actions": [
+          "explain_and_check"
+        ],
+        "must": "Check do học viên yêu cầu"
       },
       {
         "input": "Bỏ qua kiểm tra.",
@@ -72,9 +86,16 @@
       {
         "input": "Mình tưởng LLM và chatbot là một.",
         "allowed_actions": [
+          "answer"
+        ],
+        "must": "Sửa misconception, không tự thêm check"
+      },
+      {
+        "input": "Hỏi mình một câu để kiểm tra mức hiểu.",
+        "allowed_actions": [
           "explain_and_check"
         ],
-        "must": "Có check"
+        "must": "Check do học viên yêu cầu"
       },
       {
         "input": "Mình nghĩ LLM chỉ phục vụ đúng một chatbot, không dùng ứng dụng khác được.",
@@ -107,9 +128,16 @@
       {
         "input": "Mình tưởng LLM là chatbot.",
         "allowed_actions": [
+          "answer"
+        ],
+        "must": "Sửa misconception, không tự thêm check"
+      },
+      {
+        "input": "Hỏi mình một câu để kiểm tra mức hiểu.",
+        "allowed_actions": [
           "explain_and_check"
         ],
-        "must": "Có check"
+        "must": "Check do học viên yêu cầu"
       },
       {
         "input": "Không phải ý đó, mình đang hỏi token ở trang 13.",
@@ -121,8 +149,7 @@
       {
         "input": "Token có luôn bằng một từ không?",
         "allowed_actions": [
-          "answer",
-          "explain_and_check"
+          "answer"
         ],
         "must": "Trả lời từ page 13, không chấm check cũ"
       }

@@ -16,6 +16,8 @@ All cases, provenance, pilot outputs, run reports, and reviewer tooling are in *
 
 The assignment requires humans to design/review coverage and case content. These agent-authored adaptations are a starting point for that work; independent human grading cannot be replaced by the assistant claiming it happened.
 
+The current draft contract uses **optional comprehension checks**. Ordinary explanations, examples and misconception corrections expect `answer`; assessment fixtures and rollouts explicitly opt in. Help while a check is pending must return to teaching without grading or marking skip. Offline regression tests cover these transitions and rejected generator outputs. Free-text intent recognition still needs real-provider review, including paraphrases, negations, quoted requests and mixed answer/help turns. Historical pilot/run snapshots use their original contract; their scores do not measure this revision.
+
 ## Commands
 
 For an individual replay in the UI, launch the Streamlit app and open **Replay tests** in its sidebar. Select a case, inspect its preloaded history/state and expectations, then click **Chạy replay**. The page uses this runner's replay function and keeps results separate from live chat. Download the result JSON for manual review; UI runs do not populate official run directories or satisfy required live rollouts. See [the app guide](../codebase/README.md#manual-replay-testing).
@@ -35,6 +37,8 @@ Run from the repo root after configuring the compatible API as in [codebase/READ
 ```
 
 Each command creates a new run folder. `report.md` is the readable output; `outputs.jsonl` has every actual response, retrieved IDs, state transition, raw model output, usage, latency, retries and errors. `manifest.json`, `cases.jsonl`, and `prompt.txt` pin the exact configuration/input used. No API key is recorded. Reruns are separate artifacts, never overwrites or cherry-picked completions.
+
+New runs also pin `route-prompt.txt` and its hash. Traces label routing, teaching and verification calls separately. The per-turn limit is one routing call plus two teaching/retry/verification calls; button intents bypass routing.
 
 `--limit 1` is useful for a connection check; it is not a full evaluation. Five cases (GS-005/012/019/022/024) are excluded from pilot prompt tuning. Once the full suite is inspected and used for fixes, disclose that it is a regression suite rather than an unseen benchmark.
 

@@ -15,10 +15,12 @@ from codebase.knowledge import Knowledge
 from codebase.model_client import ModelClient
 from codebase.state import TutorState
 from codebase.tutor import Tutor
+from codebase.turns import ROUTE_PROMPT
 
 EVAL = ROOT/'eval'
 CONTRACT = ['eval/golden.json','eval/rollout-scripts.json','eval/source-manifest.json',
-            'eval/rubric.md','eval/quality-bar.json','codebase/prompts/baseline.md','codebase/prompts/common.md']
+            'eval/rubric.md','eval/quality-bar.json','codebase/prompts/baseline.md','codebase/prompts/common.md',
+            'codebase/turns.py']
 
 
 def digest(path):
@@ -158,12 +160,14 @@ def main():
     manifest={'run_id':run_id,'phase':args.phase,'variant':args.variant,'settings':settings.public(),
               'case_ids':[c['id'] for c in selected], 'source_sha256':knowledge.sha256,
               'contract_hashes':hashes,'prompt_sha256':tutor.prompt_hash,
+              'route_prompt_sha256':tutor.route_prompt_hash,
               'code_hashes':{str(p.relative_to(ROOT)):digest(p) for p in tracked if p.exists()},
               'rollouts_requested':args.rollouts,'human_review_status':'pending',
               'git_head':subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True).stdout.strip(),
               'started_at':datetime.now(timezone.utc).isoformat()}
     (out/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     (out/'prompt.txt').write_text(tutor.system)
+    (out/'route-prompt.txt').write_text(ROUTE_PROMPT)
     for name in ['rubric.md','quality-bar.json','rollout-scripts.json','source-manifest.json']:
         (out/name).write_bytes((EVAL/name).read_bytes())
     # Snapshot the actual contract so a later draft revision cannot erase the context of this run.

@@ -11,13 +11,18 @@ Track A · Path A1 · Nhóm K4-3B-E402-Transformer. **Prototype đã triển kha
 - Chuỗi tiêu biểu: `T07023→T07024→T07026`, `T10924→T10927→T10928`, `T12534→T12535→T12536→T12537`; counterexample `T10815→T10816` cho thấy gap cụ thể có thể được sửa trực tiếp. Năm trích dẫn nguyên văn và phương pháp đếm nằm trong mining notes.
 - Workaround: hỏi lại, yêu cầu ví dụ, sửa ngữ cảnh, tự diễn đạt giả thuyết sai. Dữ liệu chưa chứng minh ảnh hưởng lên điểm quiz hoặc mastery dài hạn.
 
-## §2. Impact và quyết định chọn
+## §2. Impact & quyết định chọn
 
-| Ứng viên | Evidence/phạm vi | Quyết định |
-|---|---|---|
-| Chẩn đoán sau lời giải thích thất bại | 84 lượt/58 học viên; có chuỗi hỏi lại cùng chủ đề | Chọn: quyết định hỏi hay giảng trực tiếp đo được trong hội thoại. |
-| Câu tự gõ không có căn cứ | Mining ghi 2.208 lượt/675 học viên ngoài 30/07 | Giữ citation/abstention làm guardrail. |
-| Thay đổi mọi kiểu sư phạm | `review_concept` chiếm 7.177/8.267 lượt tự gõ trong mẫu chính | Backlog: phạm vi rộng; move label không đại diện đầy đủ chất lượng. |
+| Ứng viên | Bao nhiêu người/lượt | Tín hiệu/cost quan sát được | Khả thi trong hackathon | Quyết định |
+|---|---|---|---|---|
+| Không đổi chiến lược khi học viên vẫn chưa hiểu | Phân tích ban đầu: 127 lượt/76 học viên; K4: 30 lượt/21 học viên **[1]** | Ban đầu: 117/127 là `review_concept` **[1]**; 11 lượt follow-up K4 trong các chuỗi đã giữ có 0 probing/validate theo nhãn và reply trung vị 1.353 ký tự | Cao: detector + policy + comprehension check | **Chọn** |
+| Trả lời không có nguồn truy vết | Ban đầu: 3.552/10.427 lượt tự gõ theo rule bảo thủ **[1]** | Độ phủ lớn; có nguy cơ học sai hoặc giảm niềm tin, chưa đo hậu quả thực tế | Cao | Loại vì trùng sát ví dụ có sẵn trong đề; khó chứng minh discovery độc lập. Giữ citation/abstention làm guardrail. |
+| Không tuân thủ yêu cầu “ngắn gọn” | 85 lượt/41 học viên ở phân tích ban đầu **[1]** | Ban đầu: reply trung vị 892 ký tự; 58/85 vượt 500 ký tự **[1]** | Rất cao | Đưa vào backlog; “ngắn” còn phụ thuộc loại câu hỏi |
+| Không đáp ứng nhu cầu ôn tập cá nhân | 191 lượt/95 học viên cho bốn câu lặp | 188/191 thuộc K3; cần thêm progress/quiz data để xác nhận nhu cầu chưa được đáp ứng | Trung bình | Loại vì phụ thuộc dữ liệu ngoài chatlog |
+
+Hướng Diagnostic Recovery được chọn vì có pattern lặp ở cả K3 và K4, có failure cụ thể để cải thiện, và quyết định trung tâm đủ nhỏ để build/đo trong thời gian sự kiện.
+
+**[1] Trạng thái evidence:** các số đánh dấu là số của phân tích ban đầu được giữ để truy vết quyết định; chưa tái lập được vì chưa có rule/danh sách turn tương ứng trong repo. Kiểm tra lại CSV xác nhận mẫu đã đọc tay là **136 lượt/80 học viên**, gồm K4 **33 lượt/22 học viên**, với **126/136** `review_concept`. Tách hoạt động lớp ngày 30/07 còn **84 lượt/58 học viên**, **77/84** `review_concept`, **0/84** probing/validate — đây là mẫu chính dùng ở §1. Không gộp các phạm vi này thành một mẫu. Chi tiết phép đếm, 11 follow-up K4 và bốn câu ôn tập nằm trong [đối chiếu evidence §2](cp1-mining-notes.md#doi-chieu-evidence-s2).
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 

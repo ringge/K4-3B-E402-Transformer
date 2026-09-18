@@ -17,17 +17,25 @@ def knowledge():
 
 
 class FakeClient:
-    def __init__(self, responses):
-        self.responses=iter(responses);self.calls=[]
+    def __init__(self, responses, route_intent=None):
+        self.responses=iter(responses);self.calls=[];self.route_intent=route_intent
+
+    @property
+    def teaching_calls(self):
+        return [p for p in self.calls if p['response_schema']['title'] != 'TurnRoute']
 
     def complete(self, system, payload):
         self.calls.append(deepcopy(payload))
+        if payload['response_schema']['title'] == 'TurnRoute':
+            # A canned classifier response, not a simulation of semantic quality.
+            intent=self.route_intent or ('check_answer' if payload['pending_check'] else 'help')
+            return Completion(json.dumps({'intent':intent,'learner_quote':payload['user_input']}),{},'offline-route')
         value=next(self.responses)
         if isinstance(value,Exception): raise value
         return Completion(value.model_dump_json() if isinstance(value,TutorResponse) else value,{},'offline-test')
 
 
-def grounded(knowledge, action='explain_and_check'):
+def grounded(knowledge, action='answer'):
     page=knowledge.page(10)
     block=next(b for b in page.evidence()['blocks'] if b['text'].startswith('Chatbot chỉ'))
     return TutorResponse(action=action,evidence_status='supported',reply='Chatbot là một dạng sản phẩm dùng model nền.',
@@ -65,8 +73,8 @@ def test_diagnosis_does_not_reset_and_budget_stops_loop(knowledge):
 
 def test_clear_gap_proceeds_after_two_probes(knowledge):
     result=Tutor(knowledge,FakeClient([grounded(knowledge)])).step(TutorState(diagnostic_count=2),'Mình tưởng LLM là chatbot.')
-    assert result.response.action=='explain_and_check'
-    assert result.state.pending_check and result.state.check_result=='unverified'
+    assert result.response.action=='answer'
+    assert result.state.pending_check is None and result.state.check_result=='unverified'
 
 
 def test_second_repair_stops(knowledge):
@@ -107,7 +115,7 @@ def test_false_understanding_from_ok_rejected(knowledge):
     state=TutorState(pending_check=Check(question='Vì sao?',expected_concepts=['one model many apps']))
     result=Tutor(knowledge,FakeClient([response,response])).step(state,'Ok hiểu rồi')
     assert result.error and result.state==state
-    assert all(a['error']=='unearned_understanding' for a in result.trace['attempts'])
+    assert all(a['error']=='unearned_understanding' for a in result.trace['attempts'] if a['kind']=='teaching')
 
 
 def test_correct_check_is_only_verification_route(knowledge):
@@ -127,22 +135,22 @@ def test_invalid_evidence_never_displayed(knowledge,mutation,code):
     state=TutorState()
     result=Tutor(knowledge,FakeClient([response,response])).step(state,'LLM là chatbot hả?')
     assert result.error and result.response is None and result.state==state
-    assert result.trace['attempts'][0]['error']==code
+    assert result.trace['attempts'][1]['error']==code
 
 
 def test_provider_error_keeps_exact_state_and_retry_is_bounded(knowledge):
     state=TutorState(messages=[Message(role='user',content='LLM?')])
     client=FakeClient([ModelError('provider_timeout',True),ModelError('provider_timeout',True)])
     result=Tutor(knowledge,client).step(state,'Không hiểu.',selected_page=13)
-    assert result.state==state and len(client.calls)==2
+    assert result.state==state and len(client.teaching_calls)==2
     assert result.trace['status']=='error'
 
 
 def test_one_schema_retry_and_no_duplicate_messages(knowledge):
     client=FakeClient(['{bad json',grounded(knowledge)])
     result=Tutor(knowledge,client).step(TutorState(),'Mình tưởng LLM là chatbot.')
-    assert len(result.state.messages)==2 and len(client.calls)==2
-    assert 'validation_feedback' in client.calls[1]
+    assert len(result.state.messages)==2 and len(client.teaching_calls)==2
+    assert 'validation_feedback' in client.teaching_calls[1]
     assert all('expected' not in p and 'golden' not in p for p in client.calls)
 
 
@@ -151,8 +159,8 @@ def test_selected_page_change_invalidates_check_before_model(knowledge):
     client=FakeClient([response])
     state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['cũ']),check_result='correct')
     Tutor(knowledge,client).step(state,'Chưa rõ',selected_page=13)
-    assert client.calls[0]['state']['pending_check'] is None
-    assert client.calls[0]['state']['check_result']=='unverified'
+    assert client.teaching_calls[0]['state']['pending_check'] is None
+    assert client.teaching_calls[0]['state']['check_result']=='unverified'
 
 
 def test_compatible_wire_format_and_no_key_in_public_config():
@@ -210,13 +218,13 @@ def test_new_explanation_cannot_bypass_pending_check_repair_budget(knowledge):
     state=TutorState(repair_count=1,pending_check=Check(question='Cũ?',expected_concepts=['nhiều apps']))
     result=Tutor(knowledge,FakeClient([response,response])).step(state,'Không, chỉ một chatbot.')
     assert result.error and result.state==state
-    assert result.trace['attempts'][0]['error']=='pending_check_requires_assessment'
+    assert result.trace['attempts'][1]['error']=='pending_check_requires_assessment'
 
 
 def test_one_check_can_ask_for_a_justification(knowledge):
-    response=grounded(knowledge)
+    response=grounded(knowledge,'explain_and_check')
     response.check.question='Một model phục vụ nhiều ứng dụng được không? Vì sao?'
-    result=Tutor(knowledge,FakeClient([response])).step(TutorState(),'Mình tưởng model là chatbot.')
+    result=Tutor(knowledge,FakeClient([response])).step(TutorState(),'Hỏi mình một câu kiểm tra.',intent='check')
     assert result.error is None
 
 
@@ -226,7 +234,7 @@ def test_false_positive_correct_is_blocked_by_focused_verifier(knowledge):
     client=FakeClient([response,json.dumps({'verdict':'incorrect','learner_quote':'chỉ một chatbot'})])
     result=Tutor(knowledge,client).step(state,'Không, chỉ một chatbot.')
     assert result.response.action=='fallback' and result.state.check_result=='unverified'
-    assert result.trace['guard']=='understanding_not_verified' and len(client.calls)==2
+    assert result.trace['guard']=='understanding_not_verified' and len(client.teaching_calls)==2
 
 
 def test_verifier_cannot_quote_teacher_instead_of_student(knowledge):
@@ -242,4 +250,125 @@ def test_correct_after_schema_retry_cannot_exceed_two_call_budget(knowledge):
     state=TutorState(pending_check=Check(question='Một model nhiều apps?',expected_concepts=['có']))
     client=FakeClient(['invalid json',response])
     result=Tutor(knowledge,client).step(state,'Có, một model có thể phục vụ nhiều ứng dụng.')
-    assert len(client.calls)==2 and result.state.check_result=='unverified'
+    assert len(client.calls)==3 and result.state.check_result=='unverified'
+
+
+def test_first_answer_rejects_unsolicited_check_then_confusion_gets_diagnosis(knowledge):
+    probe=fixed_response('diagnose','Bạn vướng ở model và sản phẩm, hay một model dùng cho nhiều ứng dụng?', 'vague')
+    client=FakeClient([grounded(knowledge,'explain_and_check'),grounded(knowledge),probe])
+    tutor=Tutor(knowledge,client)
+    first=tutor.step(TutorState(),'LLM khác chatbot?')
+    assert first.response.action=='answer' and first.state.pending_check is None
+    assert first.trace['attempts'][1]['error']=='check_requires_opt_in'
+    assert 'Một model có thể' not in first.state.messages[-1].content
+    second=tutor.step(first.state,'Mình chưa hiểu.')
+    assert second.response.action=='diagnose' and second.state.pending_check is None
+    assert second.state.check_result=='unverified'
+    assert len(second.state.messages)==4
+    assert second.state.messages[-1].content==probe.reply
+
+
+@pytest.mark.parametrize('text,intent,action',[
+    ('Mình chưa hiểu.','chat','diagnose'),
+    ('Bạn diễn đạt lại theo cách khác được không?','chat','answer'),
+    ('Cho ví dụ.','example','answer'),
+    ('Mình chưa hiểu.','help','diagnose'),
+    ('Có thể là không, nhưng mình vẫn chưa hiểu vì sao.','chat','diagnose'),
+])
+def test_help_suspends_check_without_skipping_or_grading(knowledge,text,intent,action):
+    response=grounded(knowledge) if action=='answer' else fixed_response('diagnose','Bạn vướng ở model hay sản phẩm?', 'help')
+    client=FakeClient([response],route_intent='help')
+    state=TutorState(pending_check=Check(question='Một model nhiều apps?',expected_concepts=['có']),
+                     diagnostic_count=1,repair_count=1)
+    result=Tutor(knowledge,client).step(state,text,intent=intent)
+    assert result.error is None and result.response.action==action
+    assert result.state.pending_check is None and result.state.check_result=='unverified'
+    assert result.response.check_assessment=='not_applicable'
+    assert result.state.repair_count==1
+    assert result.trace['check_suspended'] is True
+    assert client.teaching_calls[0]['state']['pending_check'] is None
+    assert not client.teaching_calls[0]['turn_policy']['new_check_allowed']
+    assert state.pending_check is not None  # original state remains untouched
+
+
+@pytest.mark.parametrize('intent',['chat','check'])
+def test_explicit_opt_in_creates_check(knowledge,intent):
+    client=FakeClient([grounded(knowledge,'explain_and_check')],route_intent='request_check')
+    result=Tutor(knowledge,client).step(TutorState(),'Cho mình một câu hỏi luyện tập.',intent=intent)
+    assert result.error is None and result.state.pending_check
+    assert client.teaching_calls[0]['turn_policy']['new_check_allowed']
+    assert len(client.calls)==(2 if intent=='chat' else 1)
+
+
+def test_returning_to_help_revokes_permission_for_next_turn(knowledge):
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    client=FakeClient([grounded(knowledge),grounded(knowledge,'explain_and_check'),grounded(knowledge)],route_intent='help')
+    tutor=Tutor(knowledge,client)
+    helped=tutor.step(state,'Cho ví dụ.',intent='example')
+    next_turn=tutor.step(helped.state,'Giải thích thêm về model nền.')
+    assert next_turn.response.action=='answer' and next_turn.state.pending_check is None
+    assert next_turn.trace['attempts'][1]['error']=='check_requires_opt_in'
+
+
+def test_generator_cannot_skip_on_behalf_of_confused_learner(knowledge):
+    bad=fixed_response('skip','Mình tạm bỏ qua vì bạn chưa trả lời.', 'bad')
+    good=fixed_response('diagnose','Bạn vướng ở model hay sản phẩm?', 'help')
+    client=FakeClient([bad,good],route_intent='help')
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    result=Tutor(knowledge,client).step(state,'Mình chưa hiểu.')
+    assert result.trace['attempts'][1]['error']=='skip_requires_learner_request'
+    assert result.state.messages[-1].content==good.reply
+    assert result.state.check_result=='unverified'
+
+
+def test_natural_language_skip_is_routed_without_teaching_call(knowledge):
+    client=FakeClient([],route_intent='skip')
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    result=Tutor(knowledge,client).step(state,'Để phần kiểm tra này lại nhé, mình muốn dừng ở đây.')
+    assert result.response.action=='skip' and result.state.pending_check is None
+    assert result.state.check_result=='skipped' and len(client.calls)==1
+
+
+def test_check_cannot_be_smuggled_into_answer_text(knowledge):
+    bad=grounded(knowledge)
+    bad.reply+=' Một model có thể dùng cho ứng dụng khác không?'
+    client=FakeClient([bad,grounded(knowledge)])
+    result=Tutor(knowledge,client).step(TutorState(),'LLM khác chatbot?')
+    assert result.trace['attempts'][1]['error']=='question_in_answer'
+    assert '?' not in result.state.messages[-1].content
+
+
+def test_self_report_remains_unverified_without_forced_skip(knowledge):
+    reply=fixed_response('feedback','Bạn có thể hỏi thêm khi cần nhé.', 'self_report')
+    reply.check_assessment='unclear'
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    result=Tutor(knowledge,FakeClient([reply])).step(state,'Ok hiểu rồi')
+    assert result.state.pending_check==state.pending_check
+    assert result.state.check_result=='unverified'
+
+
+@pytest.mark.parametrize('route',[
+    '{bad json',
+    json.dumps({'intent':'request_check','learner_quote':'not in input'}),
+    json.dumps({'intent':'skip','learner_quote':''}),
+    ModelError('provider_timeout',True),
+])
+def test_routing_failure_keeps_original_state_without_generating(knowledge,route):
+    class RouteClient:
+        calls=0
+        def complete(self,system,payload):
+            self.calls+=1
+            if isinstance(route,Exception): raise route
+            return Completion(route,{})
+    client=RouteClient()
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    result=Tutor(knowledge,client).step(state,'Mình chưa hiểu.',selected_page=13)
+    assert result.error and result.state==state and result.response is None
+    assert result.trace['status']=='error' and client.calls==1
+
+
+def test_failed_help_generation_does_not_commit_suspension(knowledge):
+    state=TutorState(pending_check=Check(question='Cũ?',expected_concepts=['có']))
+    client=FakeClient([ModelError('provider_timeout',True),ModelError('provider_timeout',True)],route_intent='help')
+    result=Tutor(knowledge,client).step(state,'Giải thích lại giúp mình.')
+    assert result.error and result.state==state and len(client.calls)==3
