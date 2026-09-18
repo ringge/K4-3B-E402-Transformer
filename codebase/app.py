@@ -100,16 +100,20 @@ elif state.check_result == 'skipped':
 elif state.pending_check:
     st.caption('Bạn có thể trả lời câu kiểm tra, hỏi thêm hoặc bỏ qua.')
 
-buttons = st.columns(4)
 requested = None
-for col, label, text, intent in [
-    (buttons[0], 'Mình chưa hiểu', 'Mình chưa hiểu.', 'help'),
-    (buttons[1], 'Cho ví dụ', 'Cho mình một ví dụ minh hoạ dễ hiểu cho ý vừa nói.', 'example'),
-    (buttons[2], 'Tự kiểm tra', 'Cho mình một câu hỏi để tự kiểm tra mức hiểu về ý vừa học.', 'check'),
-    (buttons[3], 'Bỏ qua kiểm tra', 'Bỏ qua kiểm tra.', 'skip'),
-]:
-    if col.button(label, use_container_width=True, disabled=bool(config_error) or (intent == 'skip' and state.pending_check is None)):
+quick_actions = [
+    ('Mình chưa hiểu', 'Mình chưa hiểu.', 'help'),
+    ('Cho ví dụ', 'Cho mình một ví dụ minh hoạ dễ hiểu cho ý vừa nói.', 'example'),
+    ('Kiểm tra mức hiểu', 'Cho mình một câu hỏi để tự kiểm tra mức hiểu về ý vừa học.', 'check'),
+]
+if state.pending_check:
+    quick_actions.append(('Bỏ qua kiểm tra', 'Bỏ qua kiểm tra.', 'skip'))
+
+for col, (label, text, intent) in zip(st.columns(len(quick_actions)), quick_actions):
+    if col.button(label, use_container_width=True, disabled=bool(config_error)):
         requested = (text, intent)
+if not state.pending_check:
+    st.caption('Kiểm tra mức hiểu: tutor sẽ hỏi một câu ngắn về ý vừa học và đánh giá câu trả lời tiếp theo của bạn.')
 
 with st.expander('Soạn câu hỏi để mang đến TA'):
     st.text_area('Bản nháp — chưa gửi', value=f'Mình đang học Day 1, trang {page}: {knowledge.page(page).title}.\n'

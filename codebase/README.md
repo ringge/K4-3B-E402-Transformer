@@ -43,7 +43,7 @@ The configured compatible provider is the primary integration; native Gemini and
 1. Select page 10 and ask “LLM khác chatbot thế nào?”.
 2. Say “Không hiểu.” The tutor should ask one focused diagnostic question.
 3. Say “Mình tưởng LLM chính là chatbot.” It should explain the specific distinction differently, without adding a test.
-4. Click **Tự kiểm tra** or ask “Hỏi mình một câu để kiểm tra mức hiểu.” Only this opt-in starts a check. Answer it, or say “Mình chưa hiểu” / request an example to return to teaching. Returning to help clears the pending check without grading or marking it skipped. A later check needs fresh opt-in. Only a correct answer to a pending check may mark that one concept verified; “Ok hiểu rồi” is not proof.
+4. Click **Kiểm tra mức hiểu** or ask “Hỏi mình một câu để kiểm tra mức hiểu.” Only this opt-in starts a check. Answer it, or say “Mình chưa hiểu” / request an example to return to teaching. Returning to help clears the pending check without grading or marking it skipped. A later check needs fresh opt-in. Only a correct answer to a pending check may mark that one concept verified; “Ok hiểu rồi” is not proof.
 5. Try “Ý mình là trang 13 nói token.” The app should update the lesson selection and discard the old check.
 6. Ask about MCP or detailed late chunking; the tutor should disclose the limits of Day 1. Open the citation expanders to inspect support.
 

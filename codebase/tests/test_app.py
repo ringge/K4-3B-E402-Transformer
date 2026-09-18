@@ -71,8 +71,19 @@ def test_help_button_leaves_check_without_skip_notice_or_routing_call():
         assert state.pending_check is None and state.check_result=='unverified'
         assert not app.info
         assert not any('Đã bỏ qua' in c.value or 'chưa xác nhận' in c.value for c in app.caption)
-        assert button(app,'Bỏ qua kiểm tra').disabled
-        assert not button(app,'Tự kiểm tra').disabled
+        assert not any(b.label=='Bỏ qua kiểm tra' for b in app.button)
+        assert not button(app,'Kiểm tra mức hiểu').disabled
+
+
+def test_skip_button_only_appears_for_pending_check():
+    with patch('codebase.config.Settings.from_env',return_value=Settings()):
+        app=AppTest.from_file(str(ROOT/'codebase/app.py')).run(timeout=20)
+        assert not any(b.label=='Bỏ qua kiểm tra' for b in app.button)
+        app.session_state['tutor_state']=TutorState(
+            pending_check=Check(question='Một model nhiều apps?',expected_concepts=['có']))
+        app.run()
+    assert not app.exception
+    assert any(b.label=='Bỏ qua kiểm tra' for b in app.button)
 
 
 def test_check_button_supplies_explicit_permission():
@@ -83,6 +94,6 @@ def test_check_button_supplies_explicit_permission():
         'codebase.model_client.ModelClient.complete',side_effect=routed_reply(reply),
     ) as complete:
         app=AppTest.from_file(str(ROOT/'codebase/app.py')).run(timeout=20)
-        button(app,'Tự kiểm tra').click().run()
+        button(app,'Kiểm tra mức hiểu').click().run()
         assert not app.exception and complete.call_count==1
         assert complete.call_args.args[1]['turn_policy']['new_check_allowed']

@@ -14,9 +14,9 @@ Run locally after configuring `.env`: `.venv/bin/python -m streamlit run codebas
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-|Trần Kim Phương  |2A202602565  |Team lead & Evidence Miner   |Chốt track, đối tượng và lát cắt vấn đề; điều phối tiến độ theo checkpoint; mining evidence từ dữ liệu hội thoại/tin nhắn và khảo sát; tổng hợp bằng chứng, viết Canvas/spec và hoàn thiện slide, báo cáo, kịch bản pitch. |
-|Trần Gia Thành  |2A202602626  |Activity Flow Designer |Thiết kế luồng hoạt động từ đầu vào đến kết quả; mô tả các bước người dùng thao tác, điểm AI tham gia và đầu ra ở từng bước; dựng mockup/sơ đồ luồng, kiểm tra các nhánh lỗi và chuẩn bị nội dung demo luồng. |
-|Nguyễn Minh Thái  |2A202602726  |AI Prototype & Golden Set Engineer |Phân tích vấn đề cần bổ sung cho AI; xây prototype và luồng demo; tạo golden set gồm các input, đáp án chuẩn và tiêu chí đạt; chạy kiểm thử, đo tỷ lệ đúng, sửa lỗi và chuẩn bị video dự phòng. |
+|Trần Kim Phương  |2A202602565  |Evidence Miner & Prototype Engineer |Mining evidence; điều phối tiến độ; review spec; làm prototype chạy trên localhost. |
+|Nguyễn Minh Thái  |2A202602726  |Golden Case & Rubric Designer |Xây dựng golden case, rubric và PDF slides. |
+|Trần Gia Thành  |2A202602626  |Activity Flow Designer |Thiết kế luồng hoạt động; dựng mockup sơ đồ luồng và quay video màn hình mockup; chỉnh sửa spec. |
 |  |  |  |  |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
