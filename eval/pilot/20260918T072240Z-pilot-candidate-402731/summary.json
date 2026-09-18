@@ -1,0 +1,15 @@
+{
+  "run_id": "20260918T072240Z-pilot-candidate-402731",
+  "phase": "pilot",
+  "variant": "candidate",
+  "planned_cases": 15,
+  "executed_cases": 15,
+  "automatic_structural_passes": 1,
+  "automatic_structural_denominator": 15,
+  "quality_passes": null,
+  "quality_bar_result": "PENDING_HUMAN_GRADING",
+  "provider_or_validation_errors": 14,
+  "model_calls": 14,
+  "critical_violations": null,
+  "note": "Automatic passes are not factuality scores, model accuracy, or evidence of learning."
+}

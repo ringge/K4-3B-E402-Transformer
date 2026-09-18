@@ -3,3 +3,10 @@ __pycache__/
 .env
 node_modules/
 data/*
+.venv/
+.pytest_cache/
+.streamlit/secrets.toml
+.env.*
+!.env.example
+eval/local/
+eval/runs/*/request-contexts.jsonl

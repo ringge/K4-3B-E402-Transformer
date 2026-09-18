@@ -1,0 +1,15 @@
+{
+  "run_id": "20260918T075456Z-exploratory-candidate-5a022e",
+  "phase": "exploratory",
+  "variant": "candidate",
+  "planned_cases": 24,
+  "executed_cases": 24,
+  "automatic_structural_passes": 20,
+  "automatic_structural_denominator": 24,
+  "quality_passes": null,
+  "quality_bar_result": "PENDING_HUMAN_GRADING",
+  "provider_or_validation_errors": 1,
+  "model_calls": 51,
+  "critical_violations": null,
+  "note": "Automatic passes are not factuality scores, model accuracy, or evidence of learning."
+}

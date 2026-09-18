@@ -1,0 +1,7 @@
+{
+  "command": ".venv/bin/python -m pytest",
+  "result": "39 passed",
+  "type": "offline engineering checks including Streamlit AppTest; not model accuracy",
+  "python": "3.13.15",
+  "human_calibration": "pending"
+}

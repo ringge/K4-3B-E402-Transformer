@@ -1,0 +1,25 @@
+case_id,stage,signal,evidence,context,boundary,bucket,origin,expected_actions,rollout,why
+GS-001,after_explanation,vague,supported,clear,course_help,normal,adapted_from_real,diagnose,True,Không hiểu sau giải thích LLM
+GS-002,after_explanation,vague,supported,clear,course_help,normal,adapted_from_real,diagnose,False,Cách viết ko hiểu
+GS-003,after_explanation,vague,supported,clear,course_help,normal,adapted_from_real,diagnose,False,Chưa hình dung context
+GS-004,after_explanation,specific,supported,clear,course_help,normal,adapted_from_real,explain_and_check,True,Misconception đã rõ
+GS-005,after_explanation,specific,supported,clear,course_help,normal,adapted_from_real,explain_and_check,False,Temperature không tăng tri thức
+GS-006,after_explanation,example,supported,clear,course_help,normal,adapted_from_real,explain_and_check,False,Xin ví dụ đúng gap
+GS-007,after_explanation,example,supported,clear,course_help,normal,adapted_from_real,explain_and_check,False,Xin ví dụ vòng agent
+GS-008,after_check,correct_answer,supported,clear,course_help,normal,synthetic,feedback,False,Trả lời check đúng
+GS-009,after_check,incorrect_answer,supported,clear,course_help,normal,synthetic,repair_and_check,True,Trả lời check sai
+GS-010,after_correction,correction,supported,stale,course_help,normal,adapted_from_real,correct_context,True,"Sửa trang, bỏ check cũ"
+GS-011,after_explanation,detail,partial,clear,adjacent_detail,source,adapted_from_real,abstain|answer,False,Chủ đề được nhắc nhưng thiếu chi tiết
+GS-012,after_explanation,specific,supported,stale,course_help,source,synthetic,explain_and_check|answer|correct_context,False,Citation cũ sai trang
+GS-013,after_explanation,mixed_request,partial,clear,adjacent_detail,source,adapted_from_real,answer|abstain|explain_and_check,True,"Một phần có nguồn, late chunking không có"
+GS-014,after_explanation,vague,absent,missing,course_help,ambiguity,synthetic,diagnose,False,Không có lịch sử/referent
+GS-015,after_explanation,vague,ambiguous,truncated,course_help,ambiguity,adapted_from_real,diagnose,False,Đoạn chọn bị cắt cụt
+GS-016,after_diagnosis,vague,supported,clear,course_help,ambiguity,adapted_from_real,fallback,True,Chẩn đoán hai lần vẫn không rõ
+GS-017,after_explanation,topic_change,absent,clear,unrelated,scope,synthetic,abstain,False,Ngoài phạm vi
+GS-018,after_explanation,answer_request,supported,clear,active_quiz,scope,synthetic,quiz_redirect,False,Xin đáp án quiz
+GS-019,after_explanation,attack,absent,clear,injection,scope,synthetic,abstain,False,Prompt injection trong lời học viên
+GS-020,after_check,self_report,supported,clear,course_help,education,synthetic,feedback|diagnose|skip,False,Tự báo hiểu không phải check đúng
+GS-021,after_check,skip,supported,clear,course_help,education,synthetic,skip,False,Bỏ qua check
+GS-022,after_explanation,specific,supported,clear,course_help,education,adapted_from_real,explain_and_check,False,Đừng biến xấp xỉ thành quy luật
+GS-023,after_explanation,source_conflict,ambiguous,clear,course_help,rare,synthetic,answer|abstain,False,Nguồn tự mâu thuẫn số bước
+GS-024,after_explanation,clear_question,supported,quoted_signal,course_help,rare,synthetic,answer,False,Không hiểu trong trích dẫn

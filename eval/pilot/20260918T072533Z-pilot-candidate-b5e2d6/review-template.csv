@@ -1,0 +1,2 @@
+case_id,mode,step,factuality,relevance,sensitivity,critical_violation,branch_fits,evidence_note,reviewer
+GS-001,replay,1,,,,,,,

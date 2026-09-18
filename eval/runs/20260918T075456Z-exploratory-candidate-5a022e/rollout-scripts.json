@@ -1,0 +1,185 @@
+{
+  "GS-001": {
+    "active_page": 10,
+    "steps": [
+      {
+        "input": "LLM khác chatbot thế nào?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Giải thích có căn cứ"
+      },
+      {
+        "input": "Không hiểu.",
+        "allowed_actions": [
+          "diagnose"
+        ],
+        "must": "Một câu chẩn đoán dựa vào lời vừa giải thích"
+      },
+      {
+        "input": "Mình tưởng LLM chính là chatbot.",
+        "allowed_actions": [
+          "explain_and_check"
+        ],
+        "must": "Sửa model/sản phẩm và một check"
+      },
+      {
+        "input": "Theo mình, một LLM nền có thể dùng cho chatbot và cả ứng dụng tóm tắt; chatbot chỉ là một sản phẩm.",
+        "allowed_actions": [
+          "feedback"
+        ],
+        "must": "Chỉ xác nhận nếu câu này trả lời đúng check thực tế",
+        "requires_semantic_review": true
+      }
+    ]
+  },
+  "GS-004": {
+    "active_page": 10,
+    "steps": [
+      {
+        "input": "LLM khác chatbot thế nào?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Có nguồn"
+      },
+      {
+        "input": "Mình tưởng mỗi LLM chỉ dùng cho một chatbot duy nhất.",
+        "allowed_actions": [
+          "explain_and_check"
+        ],
+        "must": "Đi thẳng misconception, không probing"
+      },
+      {
+        "input": "Bỏ qua kiểm tra.",
+        "allowed_actions": [
+          "skip"
+        ],
+        "must": "Chưa xác nhận mức hiểu"
+      }
+    ]
+  },
+  "GS-009": {
+    "active_page": 10,
+    "steps": [
+      {
+        "input": "LLM khác chatbot thế nào?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Có nguồn"
+      },
+      {
+        "input": "Mình tưởng LLM và chatbot là một.",
+        "allowed_actions": [
+          "explain_and_check"
+        ],
+        "must": "Có check"
+      },
+      {
+        "input": "Mình nghĩ LLM chỉ phục vụ đúng một chatbot, không dùng ứng dụng khác được.",
+        "allowed_actions": [
+          "repair_and_check"
+        ],
+        "must": "Không khen đúng; sửa một lần",
+        "requires_semantic_review": true
+      },
+      {
+        "input": "Không, mình vẫn nghĩ mỗi LLM chỉ dùng cho một chatbot.",
+        "allowed_actions": [
+          "fallback"
+        ],
+        "must": "Không repair vô hạn",
+        "requires_semantic_review": true
+      }
+    ]
+  },
+  "GS-010": {
+    "active_page": 10,
+    "steps": [
+      {
+        "input": "LLM khác chatbot thế nào?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Có nguồn"
+      },
+      {
+        "input": "Mình tưởng LLM là chatbot.",
+        "allowed_actions": [
+          "explain_and_check"
+        ],
+        "must": "Có check"
+      },
+      {
+        "input": "Không phải ý đó, mình đang hỏi token ở trang 13.",
+        "allowed_actions": [
+          "correct_context"
+        ],
+        "must": "Hủy check cũ; đổi page 13"
+      },
+      {
+        "input": "Token có luôn bằng một từ không?",
+        "allowed_actions": [
+          "answer",
+          "explain_and_check"
+        ],
+        "must": "Trả lời từ page 13, không chấm check cũ"
+      }
+    ]
+  },
+  "GS-013": {
+    "active_page": 16,
+    "steps": [
+      {
+        "input": "Vì sao lấy đoạn liên quan đưa vào context?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Nguồn page 16"
+      },
+      {
+        "input": "Mình chưa hiểu late chunking làm việc đó ra sao. Giải thích thuật toán giúp mình.",
+        "allowed_actions": [
+          "abstain",
+          "answer"
+        ],
+        "must": "Phân định thiếu căn cứ cho late chunking"
+      }
+    ]
+  },
+  "GS-016": {
+    "active_page": 14,
+    "steps": [
+      {
+        "input": "Context là gì?",
+        "allowed_actions": [
+          "answer"
+        ],
+        "must": "Giải thích có nguồn"
+      },
+      {
+        "input": "Không hiểu.",
+        "allowed_actions": [
+          "diagnose"
+        ],
+        "must": "Probe 1"
+      },
+      {
+        "input": "Mình vẫn chưa biết vướng ở đâu.",
+        "allowed_actions": [
+          "diagnose",
+          "fallback"
+        ],
+        "must": "Probe 2 hoặc fallback"
+      },
+      {
+        "input": "Mình vẫn không xác định được.",
+        "allowed_actions": [
+          "fallback"
+        ],
+        "must": "Dừng, không probe lần 3"
+      }
+    ]
+  }
+}

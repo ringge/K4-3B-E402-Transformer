@@ -1,5 +1,9 @@
 # K4-3B-E402-Transformer
 
+**VLearn Tutor prototype:** [run instructions](codebase/README.md) · [evaluation workspace](eval/README.md) · [actual results](eval/results.md) · [implementation plan](cp3-implementation-plan.md) · [current spec](spec.md).
+
+Run locally after configuring `.env`: `.venv/bin/python -m streamlit run codebase/app.py`. Runtime knowledge is the supplied `data/d1-slide-hackathon.html`; all new evaluation artifacts live in this repo's `eval/`. The 24-case set is drafted and real exploratory runs are retained; independent human calibration and the official quality-bar freeze remain pending.
+
 # Mini Hackathon AI — Batch 04 · Lớp 3B
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
@@ -359,4 +363,3 @@ Dữ liệu trong `data/` là dữ liệu thật của khoá học (đã ẩn da
 6. Sau sự kiện, **xoá các bản sao data pack** khỏi máy cá nhân và các công cụ đã upload nếu ban tổ chức yêu cầu.
 
 Vi phạm được xử lý theo quy định của khoá và có thể ảnh hưởng trực tiếp đến điểm của nhóm.
-

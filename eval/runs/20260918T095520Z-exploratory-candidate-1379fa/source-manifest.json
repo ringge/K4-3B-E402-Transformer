@@ -1,0 +1,209 @@
+{
+  "source_path": "data/d1-slide-hackathon.html",
+  "sha256": "578fca3d1bca92e37e0709d74d2712516471a99d17a5d84a3181045da590978f",
+  "pages": [
+    {
+      "source_id": "D1-P001",
+      "file_page": 1,
+      "anchor": "p1",
+      "title": "AI & LLM Foundation",
+      "block_count": 2
+    },
+    {
+      "source_id": "D1-P002",
+      "file_page": 2,
+      "anchor": "p2",
+      "title": "Agenda",
+      "block_count": 10
+    },
+    {
+      "source_id": "D1-P003",
+      "file_page": 3,
+      "anchor": "p3",
+      "title": "AI, ML, Deep Learning, GenAI, LLM — nằm ở đâu trong cùng một hệ?",
+      "block_count": 14
+    },
+    {
+      "source_id": "D1-P004",
+      "file_page": 4,
+      "anchor": "p4",
+      "title": "Ba nhóm AI chính: phân loại • sinh nội dung • hành động",
+      "block_count": 13
+    },
+    {
+      "source_id": "D1-P005",
+      "file_page": 5,
+      "anchor": "p5",
+      "title": "Lịch sử AI 70 năm",
+      "block_count": 23
+    },
+    {
+      "source_id": "D1-P006",
+      "file_page": 6,
+      "anchor": "p6",
+      "title": "1980: Hệ chuyên gia (expert system)",
+      "block_count": 23
+    },
+    {
+      "source_id": "D1-P007",
+      "file_page": 7,
+      "anchor": "p7",
+      "title": "2009: Fei-Fei Li và ImageNet — cuộc cách mạng của dữ liệu",
+      "block_count": 23
+    },
+    {
+      "source_id": "D1-P008",
+      "file_page": 8,
+      "anchor": "p8",
+      "title": "2017: Transformer",
+      "block_count": 9
+    },
+    {
+      "source_id": "D1-P009",
+      "file_page": 9,
+      "anchor": "p9",
+      "title": "2022: ChatGPT",
+      "block_count": 4
+    },
+    {
+      "source_id": "D1-P010",
+      "file_page": 10,
+      "anchor": "p10",
+      "title": "LLM là gì? — một bộ não nền, không phải một chatbot",
+      "block_count": 8
+    },
+    {
+      "source_id": "D1-P011",
+      "file_page": 11,
+      "anchor": "p11",
+      "title": "Bên trong Transformer: đầu ra luôn là một phân bố xác suất",
+      "block_count": 18
+    },
+    {
+      "source_id": "D1-P012",
+      "file_page": 12,
+      "anchor": "p12",
+      "title": "Sinh văn bản = đoán → nối vào câu → đoán tiếp",
+      "block_count": 12
+    },
+    {
+      "source_id": "D1-P013",
+      "file_page": 13,
+      "anchor": "p13",
+      "title": "Token: model không đọc \"từ\", model đọc mảnh chữ",
+      "block_count": 12
+    },
+    {
+      "source_id": "D1-P014",
+      "file_page": 14,
+      "anchor": "p14",
+      "title": "Context: bàn làm việc có hạn của model",
+      "block_count": 23
+    },
+    {
+      "source_id": "D1-P015",
+      "file_page": 15,
+      "anchor": "p15",
+      "title": "Attention: mỗi từ được “nhìn sang” những từ quan trọng khác",
+      "block_count": 7
+    },
+    {
+      "source_id": "D1-P016",
+      "file_page": 16,
+      "anchor": "p16",
+      "title": "Hiểu attention để dùng AI hiệu quả: quản context = quản sự chú ý",
+      "block_count": 9
+    },
+    {
+      "source_id": "D1-P017",
+      "file_page": 17,
+      "anchor": "p17",
+      "title": "Tham số (parameter): những \"khớp nối\" model học được",
+      "block_count": 17
+    },
+    {
+      "source_id": "D1-P018",
+      "file_page": 18,
+      "anchor": "p18",
+      "title": "LLM được tạo ra như thế nào? — đọc nhiều, được chỉ, được uốn nắn, luyện đề",
+      "block_count": 19
+    },
+    {
+      "source_id": "D1-P019",
+      "file_page": 19,
+      "anchor": "p19",
+      "title": "RLHF: ba bước uốn cỗ máy đoán token thành trợ lý biết nghe lời",
+      "block_count": 30
+    },
+    {
+      "source_id": "D1-P020",
+      "file_page": 20,
+      "anchor": "p20",
+      "title": "Giới hạn bẩm sinh: học giả trong bong bóng",
+      "block_count": 10
+    },
+    {
+      "source_id": "D1-P021",
+      "file_page": 21,
+      "anchor": "p21",
+      "title": "Vì sao model vẫn sai: nó rất giỏi học vẹt đường tắt",
+      "block_count": 7
+    },
+    {
+      "source_id": "D1-P022",
+      "file_page": 22,
+      "anchor": "p22",
+      "title": "Chain-of-Thought: chỉ thêm \"giấy nháp\", từ sai thành đúng",
+      "block_count": 11
+    },
+    {
+      "source_id": "D1-P023",
+      "file_page": 23,
+      "anchor": "p23",
+      "title": "Từ LLM đến agent: bốn mức độ — mỗi bậc thêm một năng lực",
+      "block_count": 15
+    },
+    {
+      "source_id": "D1-P024",
+      "file_page": 24,
+      "anchor": "p24",
+      "title": "Giải phẫu một agent: 5 bộ phận là một vòng lặp",
+      "block_count": 11
+    },
+    {
+      "source_id": "D1-P025",
+      "file_page": 25,
+      "anchor": "p25",
+      "title": "Cùng một mức năng lực, giá rơi khoảng 10 lần mỗi năm",
+      "block_count": 13
+    },
+    {
+      "source_id": "D1-P026",
+      "file_page": 26,
+      "anchor": "p26",
+      "title": "Chọn model theo TẦNG, không chọn theo tên",
+      "block_count": 21
+    },
+    {
+      "source_id": "D1-P027",
+      "file_page": 27,
+      "anchor": "p27",
+      "title": "Token có giá: vé vào rẻ, vé ra đắt gấp 3—5 lần",
+      "block_count": 17
+    },
+    {
+      "source_id": "D1-P028",
+      "file_page": 28,
+      "anchor": "p28",
+      "title": "Giải phẫu một prompt: bốn lớp xếp chồng",
+      "block_count": 7
+    },
+    {
+      "source_id": "D1-P029",
+      "file_page": 29,
+      "anchor": "p29",
+      "title": "Hai núm vặn chọn từ: temperature & top_p",
+      "block_count": 23
+    }
+  ]
+}
