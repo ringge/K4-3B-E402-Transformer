@@ -19,20 +19,60 @@ Track A · Path A1 · Nhóm K4-3B-E402-Transformer. **Prototype đã triển kha
 | Câu tự gõ không có căn cứ | Mining ghi 2.208 lượt/675 học viên ngoài 30/07 | Giữ citation/abstention làm guardrail. |
 | Thay đổi mọi kiểu sư phạm | `review_concept` chiếm 7.177/8.267 lượt tự gõ trong mẫu chính | Backlog: phạm vi rộng; move label không đại diện đầy đủ chất lượng. |
 
-## §3. Giải pháp tham chiếu
+## §3. Giải pháp tương tự đã nghiên cứu
 
-- Baseline quan sát: tutor VLearn trong data pack; không có toàn bộ production prompt/hạ tầng.
-- Baseline thực nghiệm: prompt giải thích lại, dùng cùng model/nguồn/core với candidate. Đây là controlled prompt baseline, không phải đo lại production VLearn.
-- CP2: [mockup](codebase/checkpoint2_mockup.html) với phản hồi scripted. Bản Streamlit thay quyết định/diễn đạt ở lõi bằng API thật.
-- Nghiên cứu hai sản phẩm bên ngoài theo template: **chưa hoàn thành**; không dùng kiểm thử kỹ thuật để thay mục này.
+Nghiên cứu tài liệu và demo chính thức, đối chiếu ngày 18/09/2026; chưa có thử nghiệm trực tiếp trên tài khoản của hai sản phẩm. “Đáng học”, “đáng né” và “mình khác gì” là phân tích thiết kế của nhóm, không phải kết quả đo so sánh hiệu quả học tập. Hai sản phẩm được chọn vì đại diện cho hai yêu cầu của lát cắt: dẫn dắt người học tìm gap và trả lời có căn cứ truy vết được.
+
+### §3a. ChatGPT — OpenAI
+
+Tham chiếu [hướng dẫn sử dụng ChatGPT của OpenAI](https://learn.chatgpt.com/docs/use-chatgpt). Phân tích tập trung vào flow Chat dùng để hỏi và làm rõ kiến thức qua hội thoại; không đánh đồng flow này với mọi chế độ học tập hay cấu hình tùy chỉnh của ChatGPT. Ví dụ yêu cầu học tập trong bảng là cách nhóm áp dụng flow tài liệu mô tả, chưa phải transcript thử nghiệm trực tiếp.
+
+| Câu hỏi | Phân tích và quyết định cho nhóm |
+|---|---|
+| Flow của họ? | Người dùng mở Chat → nhập câu hỏi hoặc đưa ngữ cảnh/tài liệu → nhận giải thích → review, bổ sung thông tin hoặc yêu cầu sửa hướng trả lời.|
+| Điều đáng học? | Hội thoại tự nhiên, cho phép bổ sung ngữ cảnh và yêu cầu điều chỉnh cụ thể; tài liệu OpenAI cũng khuyến khích kiểm tra claim và đối chiếu nguồn gốc. Áp dụng: giữ free-text, lịch sử gần, nút “Mình chưa hiểu”/“Cho ví dụ” và citation để học viên kiểm tra lời giải thích. |
+| Điều đáng né? | Tình huống cần tránh: sau một lời giải thích, học viên chỉ nói “Mình chưa hiểu vấn đề”, tutor giải thích thẳng một lần nữa mà không hỏi để xác định chỗ vướng. Khi đó, tutor đang tự chọn nguyên nhân: thiếu định nghĩa, hiểu sai quan hệ hay chưa biết áp dụng; đổi câu chữ hoặc thêm ví dụ có thể vẫn không trúng gap. Học viên phải tiếp tục hỏi lại hoặc tự chẩn đoán cho tutor. Áp dụng: nếu gap còn mơ hồ, hỏi một câu phân biệt 2–3 khả năng trước khi giải thích; gap rõ thì trả lời trực tiếp. Đây là rủi ro cần kiểm thử trên ChatGPT, chưa có transcript đối chứng để kết luận hành vi luôn xảy ra. |
+| Mình khác gì? | Prototype chuyên biệt cho học viên VLearn vừa báo chưa hiểu, cố định nguồn Day 1 và quyết định hỏi chẩn đoán hay giải thích đúng một gap. Core giữ pending check, tối đa 2 diagnostic/1 repair mỗi attempt và quiz guard; citation gắn block/quote được code kiểm. Khác biệt là các quy tắc được triển khai cho lát cắt này; không khẳng định ChatGPT không thể làm tương tự khi được cấu hình, hay nhóm có hiệu quả học tập cao hơn. |
+
+### §3b. NotebookLM / Gemini Notebook — Google
+
+Google hiện gọi sản phẩm là Gemini Notebook, trước đây là NotebookLM, theo [trang sản phẩm chính thức](https://workspace.google.com/intl/en_ca/products/gemini-notebook/). Phân tích tập trung vào chat trên nguồn đã chọn và chế độ Learning Guide trong [hướng dẫn sử dụng chat](https://support.google.com/gemininotebook/answer/16179559?hl=en), không bao quát các tính năng agentic khác.
+
+| Câu hỏi | Phân tích và quyết định cho nhóm |
+|---|---|
+| Flow của họ? | Tạo/mở notebook → thêm và chọn nguồn → cấu hình Learning Guide, độ dài phản hồi → hỏi về tài liệu → đọc câu trả lời, mở citation để xem đoạn gốc trong ngữ cảnh. |
+| Điều đáng học? | Đặt nguồn cạnh câu trả lời, cho người học tự kiểm tra căn cứ và điều chỉnh cách phản hồi. Áp dụng: panel bài học theo trang, citation mở lại nguồn; mỗi claim quan trọng phải gắn block và quote. |
+| Điều đáng né? | Tình huống cần tránh: học viên nói “Mình chưa hiểu vấn đề”, tutor tiếp tục giải thích/tóm tắt tài liệu có citation mà chưa hỏi học viên vướng ở ý nào. Câu trả lời có thể đúng nguồn nhưng vẫn không giải quyết được misconception; citation xác minh căn cứ kiến thức, không xác định nguyên nhân học viên chưa hiểu. Áp dụng: giữ grounding, thêm bước chẩn đoán khi gap mơ hồ rồi giải thích đúng gap và kiểm tra lại. Đây là rủi ro cần kiểm thử trên NotebookLM/Gemini Notebook, chưa có transcript đối chứng để kết luận Learning Guide luôn bỏ qua việc hỏi lại. |
+| Mình khác gì? | Nguồn được cố định ở 29 trang Day 1, không để người dùng thêm nguồn tùy ý. Flow thiết kế quanh gap, cách giải thích trước, pending check và giới hạn retry; kết thúc bằng đánh giá câu trả lời cho một ý hoặc fallback chưa xác minh. Khác biệt là phạm vi và quy tắc prototype, chưa có bằng chứng nhóm tốt hơn Learning Guide. |
+
+**Vấn đề chung cần đối chiếu:** “Chưa hiểu” là tín hiệu lời giải thích trước chưa giúp được người học, chưa phải mô tả đủ rõ của gap. Nếu tutor chuyển ngay từ tín hiệu này sang một lời giải thích mới, bước xác định nguyên nhân bị bỏ qua: nội dung nhiều hơn nhưng có thể vẫn lệch chỗ vướng. Với ChatGPT, cần kiểm tra xem phản hồi có làm rõ gap hay chỉ diễn đạt lại; với NotebookLM/Gemini Notebook, cần kiểm tra cả độ trúng gap bên cạnh độ đúng nguồn. Chưa có thử nghiệm trực tiếp để gán lỗi này cho mọi phản hồi của hai sản phẩm; evidence hiện có cho hành vi giải thích tiếp nằm ở tutor VLearn trong mining notes.
+
+**Ví dụ kiểm thử đề xuất — chưa phải hội thoại đã chạy:** sau lời giải thích về context window, học viên nói “Mình chưa hiểu vấn đề”. Phản hồi cần tránh là giảng lại cả context window ngay. Phản hồi mong muốn là “Bạn đang vướng ở giới hạn lượng nội dung model nhìn thấy, hay vì sao nội dung ở giữa dễ bị bỏ sót?”; sau câu trả lời của học viên mới giải thích đúng ý đó và đặt một check ngắn. Nếu học viên đã nói “Mình tưởng context window là trí nhớ vĩnh viễn”, gap đã rõ và có thể giải thích trực tiếp, không cần hỏi lại máy móc.
+
+**Quyết định rút ra:** kết hợp hỏi chẩn đoán có mục tiêu với câu trả lời truy vết về bài học; tránh hỏi thừa, giảng lại toàn bài và xác nhận hiểu từ lời tự báo. Evidence `T10815→T10816` hỗ trợ nhánh gap rõ; `T12534→T12535→T12536→T12537` cho thấy cần cho học viên sửa ngữ cảnh trước khi giảng tiếp ([mining notes](cp1-mining-notes.md)).
+
+**Baseline nội bộ để đánh giá:** tutor VLearn trong data pack là baseline quan sát, không có toàn bộ production prompt/hạ tầng. Baseline thực nghiệm là prompt giải thích lại dùng cùng model/nguồn/core với candidate, không phải đo lại production VLearn. [Mockup CP2](codebase/checkpoint2_mockup.html) có phản hồi scripted; bản Streamlit dùng API thật ở quyết định/diễn đạt lõi.
 
 ## §4. Thiết kế và automation
 
-**Lát cắt:** học viên báo chưa hiểu sau một lời giải thích → AI xác định gap đã rõ chưa → hỏi một câu chẩn đoán hoặc giải thích mục tiêu → kiểm tra ý vừa học hoặc fallback hữu ích.
+**Lát cắt một câu:** Học viên VLearn vừa báo “vẫn chưa hiểu” sau một lời giải thích cần tìm đúng chỗ vướng, AI quyết định gap đã đủ rõ để giải thích tiếp hay cần một câu chẩn đoán, để học viên nhận giải thích đúng một gap và trả lời một câu kiểm tra ý vừa học hoặc nhận bước tiếp theo khi chưa thể xác minh.
 
-Conditional automation: AI chọn move và viết câu trả lời; code giữ giới hạn nguồn, state, retry và quiz. Một check đúng chỉ chứng minh câu trả lời cho ý vừa kiểm tra. Không tự kết luận hiểu từ “ok/hiểu rồi”, hoặc skip.
+**Quy tắc quyết định:** gap mơ hồ nhưng có ngữ cảnh thì hỏi một câu ngắn phân biệt 2–3 khả năng; thiếu ngữ cảnh thì xin trang/đoạn thay vì đoán. Gap đã rõ thì giải thích trực tiếp bằng cách biểu đạt khác lượt trước, không bắt buộc hỏi thêm. Không đủ nguồn thì trả phần có căn cứ và nói rõ phần thiếu, hoặc abstain. Câu hỏi kiến thức đầu tiên rõ và có nguồn vẫn được trả lời ngắn, không tự kích hoạt chẩn đoán khi chưa có tín hiệu thất bại. Đây là policy trong [prompt candidate](codebase/prompts/tutor.md); mức tuân thủ cần chấm theo §7.
 
-Thật: free-text UI, API call, local source retrieval, conversation state, citations, correction, skip, bounded retry và eval runner. Scripted: boundary messages, synthetic/adapted replay histories và learner inputs trong live rollout; không trình bày chúng như lời học viên thật.
+**Mức automation: conditional automation.** AI tự chọn move và viết câu trả lời trong biên nguồn; code kiểm schema/citation và giữ state, ngân sách retry, quiz guard. Học viên giữ quyền chọn/sửa trang, mô tả lại gap, bỏ qua check, restart và tự mang bản nháp đến TA. Quyết định “đã đủ căn cứ để giảng” là định tính của model qua `evidence_status` và state, không có ngưỡng confidence xác suất đã được calibration.
+
+**Lý do theo cost-of-error:**
+
+| Quyết định sai | Chi phí/hậu quả | Cách giới hạn automation |
+|---|---|---|
+| Đoán sai gap rồi giảng tiếp | Tốn thêm lượt đọc/hỏi lại, có thể củng cố misconception; chưa đo được ảnh hưởng lên learning outcome. | Gap mơ hồ phải làm rõ; mỗi lượt chỉ xử lý một gap, cho phép sửa ngữ cảnh. |
+| Hỏi thêm khi gap đã rõ | Thêm một lượt tương tác và chờ API; học viên có thể nản vì tutor hỏi vòng. | Cho phép giải thích trực tiếp; tối đa 2 diagnostic mỗi attempt, mỗi lượt tối đa một câu hỏi. |
+| Báo hiểu đúng khi học viên trả lời sai hoặc chỉ nói “ok” | Tạo sự tự tin sai để học viên tiếp tục học. Đây là lỗi có chi phí cao hơn việc giữ trạng thái chưa xác minh. | Chỉ đánh giá khi có pending check và câu trả lời thực; cần lượt xác minh hẹp đồng ý trước khi hiển thị đúng. Một check đúng không được suy thành mastery. |
+| Bịa nguồn/giảng ngoài bài hoặc lộ đáp án quiz | Học sai và làm mất tính toàn vẹn của đánh giá. | Giới hạn nguồn, kiểm ID/quote, abstain/partial và quiz redirect. Citation đúng hình thức chưa bảo đảm claim được nguồn hỗ trợ; vẫn cần chấm tay. |
+
+Không chọn automate toàn bộ việc kết luận hiểu bài vì chi phí xác nhận sai cao và thiếu dữ liệu mastery; cũng không yêu cầu TA duyệt từng phản hồi vì lát cắt cần trợ giúp ngay. Bản nháp TA là fallback do học viên chủ động sử dụng. Giả định một câu chẩn đoán giúp giảm giảng lệch vẫn cần validation, chưa được coi là kết quả đã chứng minh.
+
+**Mức prototype: Working, chạy cục bộ.** Thật: free-text UI, API call, local source retrieval, conversation state, citations, correction, skip, bounded retry và eval runner. Scripted: boundary messages, synthetic/adapted replay histories và learner inputs trong live rollout; không trình bày chúng như lời học viên thật. Mockup CP2 là artifact riêng, không đại diện cho lời gọi AI ở bản Working. Xem [hướng dẫn chạy và giới hạn](codebase/README.md).
 
 Nguồn duy nhất: `data/d1-slide-hackathon.html`, 29 trang. Chatlog dùng cho evidence/eval, không làm kho tri thức. Chỉ dạy kiến thức được đoạn nguồn hỗ trợ; câu ngoài phạm vi được nói rõ giới hạn, đề nghị chủ đề có nguồn hoặc soạn câu hỏi TA. Partial support phải phân định rõ. Mâu thuẫn trong nguồn không bị tự sửa bằng trí nhớ model.
 
@@ -42,18 +82,31 @@ Giới hạn: ≤2 diagnostic và ≤1 repair mỗi attempt; lỗi API/JSON có 
 
 Trước khi hiển thị check đúng, một lượt xác minh hẹp phải đồng ý và trích đúng lời học viên. Lượt này dùng ngân sách call thứ hai đã có; bất đồng/lỗi/hết budget thì fallback chưa xác minh. Đây là guard giảm false positive, không phải chứng minh học viên đã hiểu lâu dài.
 
-Non-goals: login/VLearn integration, hồ sơ mastery dài hạn, thay đổi lộ trình, internet knowledge, arbitrary uploads, gửi tin TA thật, production deployment.
+**Non-goals — không build trong lát cắt này:**
+
+1. Login và tích hợp VLearn production: học viên chọn trang và trạng thái quiz trong UI cục bộ; không tự biết bài/quiz chưa khai báo.
+2. Hồ sơ mastery dài hạn, chấm trình độ toàn khóa hoặc dự đoán điểm: state chỉ ở phiên và kết quả chỉ cho ý vừa kiểm tra.
+3. Tự thay đổi lộ trình học hoặc tạo khóa học hoàn chỉnh: chỉ giúp tháo một gap trong bài hiện tại.
+4. Kiến thức internet và upload tùy ý: dùng duy nhất nguồn Day 1; không browsing hay thực thi code học viên.
+5. Làm thay quiz đang mở hoặc đưa hint tương đương đáp án: redirect về ôn khái niệm sau quiz.
+6. Gửi tin TA thật hoặc triển khai production: chỉ tạo bản nháp chưa gửi; chưa có handoff tích hợp hay hạ tầng vận hành production.
 
 ### §4b. HAX/PAIR áp dụng
 
-| Nguyên tắc | Áp dụng |
-|---|---|
-| G1 — làm rõ khả năng | UI ghi nguồn Day 1, có thể sai; cấu hình thiếu không giả vờ chat hoạt động. |
-| G9 — hỗ trợ sửa | Đổi trang/chủ đề cập nhật lesson panel, xoá pending check/kết quả cũ. |
-| G10 — bất định | Hỏi chẩn đoán khi gap mơ hồ; thiếu nguồn abstain/partial; hết budget fallback. |
-| G11 — căn cứ | Citation mở nguồn; claim gắn block/quote; nguồn có vấn đề được cảnh báo. |
-| G12 — tương tác gần | Giữ lời giải thích thất bại, gap, representation, pending check và recent messages. |
-| PAIR — user control | Skip, restart, TA draft; không ép tiếp tục check. |
+Đối chiếu mã/nghĩa theo [Microsoft HAX Design Library](https://www.microsoft.com/en-us/haxtoolkit/library/), cùng hai chương PAIR [Explainability + Trust](https://pair.withgoogle.com/chapter/explainability-trust/) và [Feedback + Control](https://pair.withgoogle.com/chapter/feedback-controls/). Tên nguyên tắc dưới đây được diễn giải bằng tiếng Việt. Bảng chỉ ra cơ chế hiện có và cách review; không khẳng định tất cả kịch bản đã đạt.
+
+| Nguyên tắc HAX/PAIR | Áp cụ thể vào prototype | Cách kiểm chứng / giới hạn |
+|---|---|---|
+| HAX G1 — công bố khả năng và phạm vi | Onboarding/sidebar ghi chỉ dựa slide Day 1, 29 trang; quiz control nói rõ không cung cấp đáp án. | Mở app, kiểm onboarding và hỏi ngoài bài. Không ngụ ý tutor truy cập được tài khoản VLearn. |
+| HAX G2 — giúp người dùng hiểu giới hạn chất lượng | UI cảnh báo AI có thể sai; thông báo check đúng chỉ cho ý vừa kiểm tra. | Đọc thông báo khi check đúng và khi thiếu cấu hình. Chưa công bố accuracy đã calibration; quality bar chưa freeze. |
+| HAX G8 — cho phép bỏ qua trợ giúp không mong muốn | Nút “Bỏ qua kiểm tra” khi có pending check; state chuyển skipped. | Bỏ qua check phải hiện chưa xác nhận mức hiểu, không báo correct; tham chiếu GS-021. |
+| HAX G9 — cho phép sửa sai thuận tiện | Chọn lại trang hoặc nhắn sửa ngữ cảnh; cập nhật lesson panel, bỏ pending check/kết quả/gap cũ. | Thử “Ý mình là trang 13 nói token”; lượt sau phải dùng ngữ cảnh mới. Không reset budget chỉ vì sửa trang. |
+| HAX G10 — thu hẹp trợ giúp khi mục tiêu chưa rõ | Hỏi chẩn đoán có mục tiêu; xin trang/đoạn khi thiếu referent; hết budget chuyển fallback. | Replay GS-014/015/016; không đoán chủ đề từ top retrieval. Policy do model thực hiện, cần chấm nội dung. |
+| HAX G12 — giữ ngữ cảnh tương tác gần | `TutorState` giữ lời giải thích trước, giả thuyết gap, representation, pending check và history; lượt tiếp dùng history gần. | Chạy chuỗi chưa hiểu → nêu misconception → giải thích/check; review xem có đổi cách giảng thay vì lặp lại. Chỉ nhớ trong phiên. |
+| PAIR Explainability + Trust — minh bạch căn cứ để người học điều chỉnh độ tin | Panel bài và citation mở trang; claim gắn block/quote, nguồn có cảnh báo được hiển thị. | Mở citation và đối chiếu claim trong ngữ cảnh; ID/quote do code kiểm, entailment vẫn cần chấm tay. Citation là căn cứ kiến thức, không phải giải thích toàn bộ quyết định của model. |
+| PAIR Feedback + Control — cân bằng tự động hóa với quyền điều khiển | Học viên sửa context, skip, restart hoặc tự dùng bản nháp TA; UI báo lịch sử chỉ ở phiên và nháp chưa gửi. | Skip không suy thành hiểu đúng; restart tạo attempt mới; không có hành vi gửi TA tự động. Feedback chỉ ảnh hưởng phiên, không tự train/cá nhân hóa model dài hạn. |
+
+Bằng chứng triển khai: [UI](codebase/app.py), [state](codebase/state.py), [core tutor](codebase/tutor.py), [policy](codebase/prompts/tutor.md). Bộ case và tiêu chí review nằm ở [eval/](eval/README.md); kiểm thử kỹ thuật không thay cho chấm chất lượng hay validation người dùng.
 
 ## §5. Bốn lớp chỗ khó và rủi ro
 
@@ -115,5 +168,8 @@ Còn thiếu: con người review/author final cases, hai người chấm độc
 | 18/09/2026 | Partial/correction allowlist trước freeze | GS-013/012; giữ snapshot cũ |
 | 18/09/2026 | Retry feedback; chặn thay pending check để né counter | Exploratory GS-009 |
 | 18/09/2026 | Verifier hẹp trước khi đánh dấu check correct | Run 7d57e0 GS-009/010 có false-positive praise; giữ lỗi làm evidence |
+| 18/09/2026 | Hoàn thiện §3–§4: đối chiếu Khanmigo và NotebookLM/Gemini Notebook, chốt lát cắt thiết kế, non-goals, lý do conditional automation và 8 nguyên tắc HAX/PAIR | Tài liệu/demo chính thức dẫn tại §3/§4b; đối chiếu UI/core/prompt hiện có và mining notes. Đây là desk research, chưa phải dùng thử sản phẩm ngoài hoặc validation người dùng. |
+| 18/09/2026 | Thay sản phẩm tham chiếu §3a từ Khanmigo sang ChatGPT; viết lại đủ flow, điều đáng học, điều đáng né và khác biệt | Yêu cầu cập nhật của nhóm; hướng dẫn OpenAI dẫn tại §3a. So sánh flow Chat dùng để học, chưa có thử nghiệm trực tiếp hoặc đo hiệu quả học tập. |
+| 18/09/2026 | Làm rõ rủi ro “chưa hiểu → giải thích thẳng, không chẩn đoán” ở cả hai giải pháp tham chiếu; bổ sung ví dụ kiểm thử và điều kiện gap rõ không cần hỏi thêm | Yêu cầu cập nhật của nhóm; evidence VLearn trong mining notes. Ví dụ đối chiếu ChatGPT/NotebookLM chưa chạy, không ghi thành kết quả quan sát. |
 
 Spec còn các mục chờ người thật ở trên; chưa đủ điều kiện gọi là submission hoàn chỉnh.
