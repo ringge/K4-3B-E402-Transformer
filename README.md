@@ -1,8 +1,8 @@
 # K4-3B-E402-Transformer
 
-**VLearn Tutor prototype:** [run instructions](codebase/README.md) · [evaluation workspace](eval/README.md) · [actual results](eval/results.md) · [implementation plan](cp3-implementation-plan.md) · [current spec](spec.md).
+**VLearn Tutor prototype:**
 
-Run locally after configuring `.env`: `.venv/bin/python -m streamlit run codebase/app.py`. Runtime knowledge is the supplied `data/d1-slide-hackathon.html`; all new evaluation artifacts live in this repo's `eval/`. The 24-case set is drafted and real exploratory runs are retained; independent human calibration and the official quality-bar freeze remain pending.
+Run locally after configuring `.env`: `.venv/bin/python -m streamlit run codebase/app.py`. Runtime knowledge is the supplied `data/d1-slide-hackathon.html`; all new evaluation artifacts live in this repo's `eval/`.
 
 # Mini Hackathon AI — Batch 04 · Lớp 3B
 
