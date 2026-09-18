@@ -4,8 +4,8 @@ Loại: [ x ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 
 ## §1. User & Job
 
-- Job executor: học viên VLearn vừa nhận lời giải thích nhưng vẫn chưa hiểu.
-- JTBD: xác định đúng chỗ mình còn thiếu/hiểu sai để tiếp tục học phần hiện tại.
+- Job executor: học viên VLearn vừa nhận lời giải thích nhưng vẫn chưa hiểu và hỏi lại.
+- JTBD: xác định đúng chỗ mình chưa hiểu và được giải thích rõ ràng về vấn đề đó.
 - Pain: sau khi báo chưa hiểu, học viên thường phải tự tìm và mô tả lỗ hổng, hoặc tiếp tục điều khiển tutor qua nhiều lượt giải thích dài.
 - Evidence: [canvas](canvas.md), [mining notes](cp1-mining-notes.md). Mining loại câu preset và false positive; tách hoạt động lớp ngày 30/07 để tránh chi phối. Mẫu chính 84 lượt/58 học viên; 77/84 tiếp tục `review_concept`, không có probing/validate theo nhãn đã phân tích.
 - Chuỗi tiêu biểu: `T07023→T07024→T07026`, `T10924→T10927→T10928`, `T12534→T12535→T12536→T12537`; counterexample `T10815→T10816` cho thấy gap cụ thể có thể được sửa trực tiếp. Năm trích dẫn nguyên văn và phương pháp đếm nằm trong mining notes.
