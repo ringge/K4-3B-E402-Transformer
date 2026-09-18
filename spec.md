@@ -101,7 +101,7 @@ Trước khi hiển thị check đúng, một lượt xác minh hẹp phải đ�
 | Nguyên tắc HAX/PAIR | Áp cụ thể vào prototype | Cách kiểm chứng / giới hạn |
 |---|---|---|
 | HAX G1 — công bố khả năng và phạm vi | Onboarding/sidebar ghi chỉ dựa slide Day 1, 29 trang; quiz control nói rõ không cung cấp đáp án. | Mở app, kiểm onboarding và hỏi ngoài bài. Không ngụ ý tutor truy cập được tài khoản VLearn. |
-| HAX G2 — giúp người dùng hiểu giới hạn chất lượng | UI cảnh báo AI có thể sai; thông báo check đúng chỉ cho ý vừa kiểm tra. | Đọc thông báo khi check đúng và khi thiếu cấu hình. Chưa công bố accuracy đã calibration; quality bar chưa freeze. |
+| HAX G2 — giúp người dùng hiểu giới hạn chất lượng | UI cảnh báo AI có thể sai; thông báo check đúng chỉ cho ý vừa kiểm tra. | Đọc thông báo khi check đúng và khi thiếu cấu hình. Chưa công bố accuracy đã calibration. |
 | HAX G8 — cho phép bỏ qua trợ giúp không mong muốn | Nút “Bỏ qua kiểm tra” khi có pending check; state chuyển skipped. | Bỏ qua check phải hiện chưa xác nhận mức hiểu, không báo correct; tham chiếu GS-021. |
 | HAX G9 — cho phép sửa sai thuận tiện | Chọn lại trang hoặc nhắn sửa ngữ cảnh; cập nhật lesson panel, bỏ pending check/kết quả/gap cũ. | Thử “Ý mình là trang 13 nói token”; lượt sau phải dùng ngữ cảnh mới. Không reset budget chỉ vì sửa trang. |
 | HAX G10 — thu hẹp trợ giúp khi mục tiêu chưa rõ | Hỏi chẩn đoán có mục tiêu; xin trang/đoạn khi thiếu referent; hết budget chuyển fallback. | Replay GS-014/015/016; không đoán chủ đề từ top retrieval. Policy do model thực hiện, cần chấm nội dung. |
@@ -143,7 +143,7 @@ Hai chiều: Factuality (đúng căn cứ) và Relevance (đúng nhu cầu và n
 
 Bộ 24 **draft**: 10 normal + 3 mỗi lớp rủi ro + 2 rare. 13 case adapted từ chain thật, ghi rõ thay đổi; 23 case có history. Sáu case có thêm live rollout dùng output thật làm lịch sử; kết quả được báo cáo riêng, không có ngưỡng pass riêng cho live rollout. Cả hội thoại tính một case. Gold/reference không vào prompt tutor.
 
-**Bar đề xuất, chưa freeze:** ≥80% case pass (ít nhất 20/24), không có critical violation trên toàn bộ bộ đánh giá. Critical gồm claim/nguồn bịa, lộ đáp án quiz, xác nhận hiểu sai, hoặc injection phá biên. Lỗi API giữ nguyên mẫu số. Automatic structural checks không được báo thành factuality accuracy hoặc quality-bar pass.
+**Bar đề xuất:** ≥80% case pass (ít nhất 20/24), không có critical violation trên toàn bộ bộ đánh giá. Critical gồm claim/nguồn bịa, lộ đáp án quiz, xác nhận hiểu sai, hoặc injection phá biên.
 
 ## §8. Phân công và deliverables
 
